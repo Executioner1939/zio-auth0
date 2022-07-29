@@ -1,43 +1,41 @@
 package com.skunkworks.modules.users
 
-import com.auth0.client.mgmt.filter.{UserFilter, PageFilter => JPageFilter, FieldsFilter => JFieldsFilter}
-import com.auth0.json.mgmt.users.{UsersPage, User => JUser}
-import com.auth0.json.mgmt.{Permission => JPermission}
+import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, PageFilter => JPageFilter, UserFilter => JUserFilter}
+import com.auth0.json.mgmt.users.{User => JUser}
 import com.skunkworks.core.Client
-import com.skunkworks.modules.domain.{FieldsFilter, PageFilter}
 import com.skunkworks.modules.domain.PageFilter._
-import com.skunkworks.modules.users.domain.UserFilters._
-import com.skunkworks.modules.users.domain.{Permission, User, UserFilters}
+import com.skunkworks.modules.domain.{FieldsFilter, PageFilter}
+import com.skunkworks.modules.users.domain.Identity._
+import com.skunkworks.modules.users.domain.Permission._
+import com.skunkworks.modules.users.domain.User._
+import com.skunkworks.modules.users.domain.UserFilter._
+import com.skunkworks.modules.users.domain._
+import com.skunkworks.modules.roles.domain.Role._
 import zio.Task
 
 import scala.jdk.CollectionConverters._
 
 final case class Users(client: Client) {
-  def list(filters: Option[UserFilters]): Task[UsersPage] = {
-    val params = filters.fold(new UserFilter()) { f =>
-      new UserFilter()
-        .ifSome(f.includeTotals)(_.withTotals(_))
-        .ifSome(f.searchEngineVersion)(_.withSearchEngine(_))
-        .ifSome(f.sort)(_.withSort(_))
-        .ifSome(f.query)(_.withQuery(_))
-        .ifSome(f.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
-        .ifSome(f.fields)((a, b) => a.withFields(b.fields, b.includeFields))
-    }
 
-    client.execute(
-      () => client.management.users().list(params)
-    )
+  private def toUserFilter(filter: UserFilter): JUserFilter = {
+    new JUserFilter()
+      .ifSome(filter.includeTotals)(_.withTotals(_))
+      .ifSome(filter.searchEngineVersion)(_.withSearchEngine(_))
+      .ifSome(filter.sort)(_.withSort(_))
+      .ifSome(filter.query)(_.withQuery(_))
+      .ifSome(filter.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
+      .ifSome(filter.fields)((a, b) => a.withFields(b.fields, b.includeFields))
   }
 
-  def listByEmail(emailAddress: String, filter: FieldsFilter) = {
-    val params = filter.fields.fold(new JFieldsFilter()) { fields =>
-      new JFieldsFilter().withFields(fields.fields, fields.includeFields)
-    }
 
-    client.execute(
-      () => client.management.users().listByEmail(emailAddress, params)
-    )
+  private def toPageFilter(filter: PageFilter): JPageFilter = {
+    new JPageFilter()
+      .ifSome(filter.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
+      .ifSome(filter.from)(_.withFrom(_))
+      .ifSome(filter.take)(_.withTake(_))
+      .ifSome(filter.totals)(_.withTotals(_))
   }
+
 
   def create(user: User.Create): Task[JUser] = {
     val body = new JUser(user.connection)
@@ -58,102 +56,144 @@ final case class Users(client: Client) {
     body.setId(user.user_id.orNull)
     body.setPassword(user.password.orNull)
 
-    client.execute(
-      () => client.management.users().create(body)
-    )
+    client
+      .execute(() => client.management.users().create(body))
   }
 
-  // TODO: Make Unit
-  def delete(userId: String): Task[Void] = {
-    client.execute(
-      () => client.management.users().delete(userId)
-    )
+  def list(filters: Option[UserFilter]): Task[List[User]] = {
+    val params = filters.fold(new JUserFilter())(toUserFilter)
+
+    client
+      .execute(() => client.management.users().list(params))
+      .map(_.getItems.asScala.map(_.convert).toList)
   }
 
-  // TODO: Case Class for Enrollments
-  def getEnrollments(userId: String) = {
-    client.execute(
-      () => client.management.users().getEnrollments(userId)
-    ).map(_.asScala.toList)
-  }
-
-  def addPermissions(userId: String, permissions: List[Permission.Create]): Task[Void] = {
-    val perms = permissions.map { p =>
-      val item = new JPermission()
-      item.setName(p.permission_name)
-      item.setDescription(p.description)
-      item.setResourceServerId(p.resource_server_identifier)
-      item.setResourceServerName(p.resource_server_name)
-      item
+  def listByEmail(emailAddress: String, filter: FieldsFilter): Task[List[User]] = {
+    val params = filter.fields.fold(new JFieldsFilter()) { fields =>
+      new JFieldsFilter().withFields(fields.fields, fields.includeFields)
     }
 
-
-    client.execute(
-      () => client.management.users().addPermissions(userId, perms.asJava)
-    )
+    client
+      .execute(() => client.management.users().listByEmail(emailAddress, params))
+      .map(_.asScala.map(_.convert).toList)
   }
 
-  def addRoles(userId: String, roles: List[String]) = {
-    client.execute(
-      () => client.management.users().addRoles(userId, roles.asJava)
-    )
-  }
-
-  def deleteMultiFactorProvider(userId: String, provider: String) = {
-    client.execute(
-      () => client.management.users().deleteMultifactorProvider(userId, provider)
-    )
+  def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
+    client
+      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(toUserFilter)))
+      .map(_.convert)
   }
 
 
-
-  def getById(userId: String) = {
-    client.execute(
-      () => client.management.users().get(userId, new UserFilter())
-    )
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  // Permissions
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  def listPermissions(userId: String, pageFilter: PageFilter): Task[List[Permission]] = {
+    client
+      .execute(() => client.management.users().listPermissions(userId, toPageFilter(pageFilter)))
+      .map(_.getItems.asScala.map(_.convert).toList)
   }
 
-  def getById(userId: String, filters: UserFilters) = {
-    val params = new UserFilter()
-      .ifSome(filters.includeTotals)(_.withTotals(_))
-      .ifSome(filters.searchEngineVersion)(_.withSearchEngine(_))
-      .ifSome(filters.sort)(_.withSort(_))
-      .ifSome(filters.query)(_.withQuery(_))
-      .ifSome(filters.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
-      .ifSome(filters.fields)((a, b) => a.withFields(b.fields, b.includeFields))
+  def addPermissions(userId: String, permissions: List[Permission.Create]): Task[Unit] = {
+    val perms = permissions.map(_.toJPermission).asJava
 
-    client.execute(
-      () => client.management.users().get(userId, params)
-    )
+    client
+      .execute(() => client.management.users().addPermissions(userId, perms))
+      .unit
   }
+
+  def removePermissions(userId: String, permissions: List[Permission]): Task[Unit] = {
+    client
+      .execute(() => client.management.users().removePermissions(userId, permissions.map(_.toJPermission).asJava))
+      .unit
+  }
+
+
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  // Roles
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  def listRoles(userId: String, pageFilter: PageFilter) = {
+    client
+      .execute(() => client.management.users().listRoles(userId, toPageFilter(pageFilter)))
+      .map(_.getItems.asScala.map(_.convert).toList)
+  }
+
+  def addRoles(userId: String, roles: List[String]): Task[Unit] = {
+    client
+      .execute(() => client.management.users().addRoles(userId, roles.asJava))
+      .unit
+  }
+
+
+  def removeRoles(userId: String, roleIds: List[String]): Task[Unit] = {
+    client
+      .execute(() => client.management.users().removeRoles(userId, roleIds.asJava))
+      .unit
+  }
+
+
+
+
+  def delete(userId: String): Task[Unit] = {
+    client
+      .execute(() => client.management.users().delete(userId))
+      .unit
+  }
+
+
+
+
+
+  def deleteMultiFactorProvider(userId: String, provider: String): Task[Unit] = {
+    client
+      .execute(() => client.management.users().deleteMultifactorProvider(userId, provider))
+      .unit
+  }
+
+  def rotateRecoveryCode(userId: String) = {
+    client
+      .execute(() => client.management.users().rotateRecoveryCode(userId))
+  }
+
 
   def getOrganisation(userId: String, pageFilter: PageFilter) = {
-    val params = new JPageFilter()
-      .ifSome(pageFilter.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
-      .ifSome(pageFilter.from)(_.withFrom(_))
-      .ifSome(pageFilter.take)(_.withTake(_))
-      .ifSome(pageFilter.totals)(_.withTotals(_))
+    client
+      .execute(() => client.management.users().getOrganizations(userId, toPageFilter(pageFilter)))
 
-    client.execute(
-      () => client.management.users().getOrganizations(userId, params)
-    )
-  }
-
-  def linkIdentity(primaryUserId: String, secondaryIdToken: String) = {
-    client.execute(
-      () => client.management.users().linkIdentity(primaryUserId, secondaryIdToken)
-    )
-  }
-
-  def linkIdentity(primaryUserId: String, secondaryIdToken: String, provider: String, connectionId: String) = {
-    client.execute(
-      () => client.management.users().linkIdentity(primaryUserId, secondaryIdToken, provider, connectionId)
-    )
   }
 
 
 
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  // Identity and Enrollments
+  // ************************************************************************************************************************************ //
+  // ************************************************************************************************************************************ //
+  def linkIdentity(primaryUserId: String, secondaryIdToken: String): Task[List[Identity]] = {
+    client
+      .execute(() => client.management.users().linkIdentity(primaryUserId, secondaryIdToken))
+      .map(_.asScala.map(_.convert).toList)
+  }
 
+  def linkIdentity(primaryUserId: String, secondaryIdToken: String, provider: String, connectionId: String): Task[List[Identity]] = {
+    client
+      .execute(() => client.management.users().linkIdentity(primaryUserId, secondaryIdToken, provider, connectionId))
+      .map(_.asScala.map(_.convert).toList)
+  }
 
-  client.management.users().listByEmail()
+  def unlinkIdentity(primaryUserId: String, secondaryIdToken: String, provider: String): Task[List[Identity]] = {
+    client
+      .execute(() => client.management.users().unlinkIdentity(primaryUserId, secondaryIdToken, provider))
+      .map(_.asScala.map(_.convert).toList)
+  }
+
+  def getEnrollments(userId: String): Task[List[Enrollment]] = {
+    client
+      .execute(() => client.management.users().getEnrollments(userId))
+      .map(_.asScala.map(Enrollment.fromJava).toList)
+  }
 }
