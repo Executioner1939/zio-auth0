@@ -1,0 +1,25 @@
+# scala
+target
+*.sc
+
+
+#IntelliJ
+*.ipr
+*.iws
+.gradle
+.idea
+.bsp/
+.env
+
+# sbt specific
+.cache/
+.lib/
+dist/*
+lib_managed/
+project/boot/
+project/plugins/project/
+
+# Mac stuff
+.DS_Store
+.ensime
+.ensime_cache
