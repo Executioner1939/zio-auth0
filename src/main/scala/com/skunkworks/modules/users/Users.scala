@@ -11,7 +11,7 @@ import com.skunkworks.modules.users.domain.User._
 import com.skunkworks.modules.users.domain.UserFilter._
 import com.skunkworks.modules.users.domain._
 import com.skunkworks.modules.roles.domain.Role._
-import zio.Task
+import zio.{Task, ZIO}
 
 import scala.jdk.CollectionConverters._
 
@@ -128,42 +128,76 @@ final case class Users(client: Client) {
       .unit
   }
 
-
+  /**
+   * Remove roles from a user.
+   * A token with update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
+   *
+   * @param userId  the user id
+   * @param roleIds a list of role ids to remove from the user
+   * @return a Request to execute
+   */
   def removeRoles(userId: String, roleIds: List[String]): Task[Unit] = {
     client
       .execute(() => client.management.users().removeRoles(userId, roleIds.asJava))
       .unit
   }
 
-
-
-
+  /**
+   * Delete an existing User.
+   * A token with scope delete:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/delete_users_by_id
+   *
+   * @param userId the user id
+   * @return a Request to execute.
+   */
   def delete(userId: String): Task[Unit] = {
     client
       .execute(() => client.management.users().delete(userId))
       .unit
   }
 
-
-
-
-
+  /**
+   * Delete an existing User's Multifactor Provider.
+   * A token with scope update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider
+   *
+   * @param userId   the user id
+   * @param provider the multifactor provider
+   * @return a Request to execute.
+   */
   def deleteMultiFactorProvider(userId: String, provider: String): Task[Unit] = {
     client
       .execute(() => client.management.users().deleteMultifactorProvider(userId, provider))
       .unit
   }
 
-  def rotateRecoveryCode(userId: String) = {
+  /**
+   * Rotates a User's Guardian recovery code.
+   * A token with scope update:users is needed.
+   *
+   * @param userId the user id
+   * @return a Request to execute.
+   * @see <a href="https://auth0.com/docs/api/management/v2#!/Users/post_recovery_code_regeneration">Management API2 docs</a>
+   */
+  def rotateRecoveryCode(userId: String): Task[String] = {
     client
       .execute(() => client.management.users().rotateRecoveryCode(userId))
+      .map(_.getCode)
   }
 
-
+  /**
+   * Get the organizations a user belongs to.
+   * A token with {@code read:users} and {@code read:organizations} is required.
+   *
+   * @param userId the user ID
+   * @param filter an optional pagination filter
+   * @return a Request to execute
+   * @see <a href="https://auth0.com/docs/api/management/v2#!/Users/get_organizations">https://auth0.com/docs/api/management/v2#!/Users/get_organizations</a>
+   */
   def getOrganisation(userId: String, pageFilter: PageFilter) = {
     client
       .execute(() => client.management.users().getOrganizations(userId, toPageFilter(pageFilter)))
-
   }
 
 
