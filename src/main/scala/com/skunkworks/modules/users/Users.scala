@@ -1,10 +1,12 @@
 package com.skunkworks.modules.users
 
 import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, PageFilter => JPageFilter, UserFilter => JUserFilter}
+import com.auth0.json.mgmt.organizations.OrganizationsPage
 import com.auth0.json.mgmt.users.{User => JUser}
 import com.skunkworks.core.Client
 import com.skunkworks.modules.domain.PageFilter._
 import com.skunkworks.modules.domain.{FieldsFilter, PageFilter}
+import com.skunkworks.modules.roles.domain.Role
 import com.skunkworks.modules.users.domain.Identity._
 import com.skunkworks.modules.users.domain.Permission._
 import com.skunkworks.modules.users.domain.User._
@@ -56,10 +58,18 @@ final case class Users(client: Client) {
     body.setId(user.user_id.orNull)
     body.setPassword(user.password.orNull)
 
-    client
-      .execute(() => client.management.users().create(body))
+    client.execute(() => client.management.users().create(body))
   }
 
+  /**
+   * Request all the Users.
+   * A token with scope read:users is needed.
+   * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_users
+   *
+   * @param filters the filter to use. Can be null.
+   * @return a Request to execute.
+   */
   def list(filters: Option[UserFilter]): Task[List[User]] = {
     val params = filters.fold(new JUserFilter())(toUserFilter)
 
@@ -68,6 +78,16 @@ final case class Users(client: Client) {
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 
+  /**
+   * Request all the Users that match a given email.
+   * A token with scope read:users is needed.
+   * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
+   * See https://auth0.com/docs/api/management/v2#!/Users_By_Email/get_users_by_email
+   *
+   * @param emailAddress the email of the users to look up.
+   * @param filter       the filter to use. Can be null.
+   * @return a Request to execute.
+   */
   def listByEmail(emailAddress: String, filter: FieldsFilter): Task[List[User]] = {
     val params = filter.fields.fold(new JFieldsFilter()) { fields =>
       new JFieldsFilter().withFields(fields.fields, fields.includeFields)
@@ -78,6 +98,16 @@ final case class Users(client: Client) {
       .map(_.asScala.map(_.convert).toList)
   }
 
+  /**
+   * Request a User.
+   * A token with scope read:users is needed.
+   * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id
+   *
+   * @param userId  the id of the user to retrieve.
+   * @param filters the filter to use. Can be null.
+   * @return a Request to execute.
+   */
   def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
     client
       .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(toUserFilter)))
@@ -90,12 +120,31 @@ final case class Users(client: Client) {
   // Permissions
   // ************************************************************************************************************************************ //
   // ************************************************************************************************************************************ //
+
+  /**
+   * Get the permissions associated to the user.
+   * A token with read:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_permissions
+   *
+   * @param userId the role id
+   * @param filter an optional pagination filter
+   * @return a Request to execute
+   */
   def listPermissions(userId: String, pageFilter: PageFilter): Task[List[Permission]] = {
     client
       .execute(() => client.management.users().listPermissions(userId, toPageFilter(pageFilter)))
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 
+  /**
+   * Assign permissions to a user.
+   * A token with update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/post_permissions
+   *
+   * @param userId      the user id
+   * @param permissions a list of permission objects to assign to the user
+   * @return a Request to execute
+   */
   def addPermissions(userId: String, permissions: List[Permission.Create]): Task[Unit] = {
     val perms = permissions.map(_.toJPermission).asJava
 
@@ -104,6 +153,15 @@ final case class Users(client: Client) {
       .unit
   }
 
+  /**
+   * Remove permissions from a user.
+   * A token with update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/delete_permissions
+   *
+   * @param userId      the user id
+   * @param permissions a list of permission objects to remove from the user
+   * @return a Request to execute
+   */
   def removePermissions(userId: String, permissions: List[Permission]): Task[Unit] = {
     client
       .execute(() => client.management.users().removePermissions(userId, permissions.map(_.toJPermission).asJava))
@@ -116,15 +174,34 @@ final case class Users(client: Client) {
   // Roles
   // ************************************************************************************************************************************ //
   // ************************************************************************************************************************************ //
-  def listRoles(userId: String, pageFilter: PageFilter) = {
+
+  /**
+   * Get the roles associated with a user.
+   * A token with read:users and read:roles is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
+   *
+   * @param userId     the role id
+   * @param pageFilter an optional pagination filter
+   * @return a Request to execute
+   */
+  def listRoles(userId: String, pageFilter: PageFilter): Task[List[Role]] = {
     client
       .execute(() => client.management.users().listRoles(userId, toPageFilter(pageFilter)))
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 
-  def addRoles(userId: String, roles: List[String]): Task[Unit] = {
+  /**
+   * Assign roles to a user.
+   * A token with update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
+   *
+   * @param userId   the user id
+   * @param rolesIds a list of role ids to assign to the user
+   * @return a Request to execute
+   */
+  def addRoles(userId: String, rolesIds: List[String]): Task[Unit] = {
     client
-      .execute(() => client.management.users().addRoles(userId, roles.asJava))
+      .execute(() => client.management.users().addRoles(userId, rolesIds.asJava))
       .unit
   }
 
@@ -195,11 +272,10 @@ final case class Users(client: Client) {
    * @return a Request to execute
    * @see <a href="https://auth0.com/docs/api/management/v2#!/Users/get_organizations">https://auth0.com/docs/api/management/v2#!/Users/get_organizations</a>
    */
-  def getOrganisation(userId: String, pageFilter: PageFilter) = {
+  def getOrganisation(userId: String, pageFilter: PageFilter): Task[OrganizationsPage] = {
     client
       .execute(() => client.management.users().getOrganizations(userId, toPageFilter(pageFilter)))
   }
-
 
 
   // ************************************************************************************************************************************ //
@@ -207,24 +283,63 @@ final case class Users(client: Client) {
   // Identity and Enrollments
   // ************************************************************************************************************************************ //
   // ************************************************************************************************************************************ //
+
+  /**
+   * A token with scope update:current_user_identities is needed.
+   * It only works for the user the access token represents.
+   * See https://auth0.com/docs/api/management/v2#!/Users/post_identities
+   *
+   * @param primaryUserId    the primary identity's user id associated with the access token this client was configured with.
+   * @param secondaryIdToken the user ID token representing the identity to link with the current user
+   * @return a Request to execute.
+   */
   def linkIdentity(primaryUserId: String, secondaryIdToken: String): Task[List[Identity]] = {
     client
       .execute(() => client.management.users().linkIdentity(primaryUserId, secondaryIdToken))
       .map(_.asScala.map(_.convert).toList)
   }
 
-  def linkIdentity(primaryUserId: String, secondaryIdToken: String, provider: String, connectionId: String): Task[List[Identity]] = {
+  /**
+   * Links two User's Identities.
+   * A token with scope update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/post_identities
+   *
+   * @param primaryUserId   the primary identity's user id
+   * @param secondaryUserId the secondary identity's user id
+   * @param provider        the provider name of the secondary identity.
+   * @param connectionId    the connection id of the secondary account being linked, useful if the provider is 'auth0' and you have several connections. Can be null.
+   * @return a Request to execute.
+   */
+  def linkIdentity(primaryUserId: String, secondaryUserId: String, provider: String, connectionId: String): Task[List[Identity]] = {
     client
-      .execute(() => client.management.users().linkIdentity(primaryUserId, secondaryIdToken, provider, connectionId))
+      .execute(() => client.management.users().linkIdentity(primaryUserId, secondaryUserId, provider, connectionId))
       .map(_.asScala.map(_.convert).toList)
   }
 
-  def unlinkIdentity(primaryUserId: String, secondaryIdToken: String, provider: String): Task[List[Identity]] = {
+  /**
+   * Un-links two User's Identities.
+   * A token with scope update:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
+   *
+   * @param primaryUserId   the primary identity's user id
+   * @param secondaryUserId the secondary identity's user id
+   * @param provider        the provider name of the secondary identity.
+   * @return a Request to execute.
+   */
+  def unlinkIdentity(primaryUserId: String, secondaryUserId: String, provider: String): Task[List[Identity]] = {
     client
-      .execute(() => client.management.users().unlinkIdentity(primaryUserId, secondaryIdToken, provider))
+      .execute(() => client.management.users().unlinkIdentity(primaryUserId, secondaryUserId, provider))
       .map(_.asScala.map(_.convert).toList)
   }
 
+  /**
+   * Retreive the first confirmed enrollment, or a pending enrollment if none are confirmed.
+   * A token with scope read:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_enrollments
+   *
+   * @param userId the id of the user to retrieve.
+   * @return a Request to execute.
+   */
   def getEnrollments(userId: String): Task[List[Enrollment]] = {
     client
       .execute(() => client.management.users().getEnrollments(userId))
