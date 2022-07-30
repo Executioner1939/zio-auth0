@@ -31,11 +31,11 @@ final case class Client(configuration: Configuration, semaphore: Semaphore, ref:
     val request = auth.requestToken(s"${configuration.domain}/api/v2/")
 
     for {
-      _ <- ZIO.logDebug("Access Token Expired, refreshing...")
+      _     <- ZIO.logDebug("Access Token Expired, refreshing...")
       token <- ZIO.fromCompletableFuture(request.executeAsync())
-      _ = management.setApiToken(token.getAccessToken)
-      _ <- ref.set(token)
-      _ <- ZIO.logDebug("Access Token Refreshed, performing request...")
+      _      = management.setApiToken(token.getAccessToken)
+      _     <- ref.set(token)
+      _     <- ZIO.logDebug("Access Token Refreshed, performing request...")
     } yield ()
   }
 
@@ -60,8 +60,8 @@ final case class Client(configuration: Configuration, semaphore: Semaphore, ref:
     semaphore.withPermit {
       for {
         isTokenExpired <- isTokenExpired
-        _ <- renewAccessToken().when(isTokenExpired)
-        result <- ZIO.fromCompletableFuture(request().executeAsync())
+        _              <- renewAccessToken().when(isTokenExpired)
+        result         <- ZIO.fromCompletableFuture(request().executeAsync())
       } yield result
     }
   }
@@ -99,14 +99,14 @@ final case class Client(configuration: Configuration, semaphore: Semaphore, ref:
     def create(configuration: Configuration): TaskLayer[Client] = {
       ZLayer {
         for {
-          _ <- ZIO.logDebug("Constructing Auth0 AuthAPI to retrieve Access Tokens")
-          authApi = createAuthApi(configuration)
-          _ <- ZIO.logDebug("Attempting to Authenticate to the Auth0 Management API")
-          tokenHolder <- getAccessToken(configuration, authApi)
+          _              <- ZIO.logDebug("Constructing Auth0 AuthAPI to retrieve Access Tokens")
+          authApi         = createAuthApi(configuration)
+          _              <- ZIO.logDebug("Attempting to Authenticate to the Auth0 Management API")
+          tokenHolder    <- getAccessToken(configuration, authApi)
           tokenHolderRef <- Ref.make(tokenHolder)
-          _ <- ZIO.logDebug("Authentication Successful...Creating Management API")
-          managementApi = new ManagementAPI(configuration.domain, tokenHolder.getAccessToken)
-          semaphore <- Semaphore.make(1)
+          _              <- ZIO.logDebug("Authentication Successful...Creating Management API")
+          managementApi   = new ManagementAPI(configuration.domain, tokenHolder.getAccessToken)
+          semaphore      <- Semaphore.make(1)
         } yield new Client(configuration, semaphore, tokenHolderRef, authApi, managementApi)
       }
     }
