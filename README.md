@@ -48,12 +48,12 @@ The status of each of the API endpoints is documented below:
 
 ### Milestone 1
 
-The first milestone will be to wrap the Auth0 Java SDK completely, providing a more Scala / ZIO like experince while working with it.
+The first milestone will be to wrap the Auth0 Java SDK completely, providing a more Scala / ZIO like experience while working with it.
 
 ### Milestone 2
 
 The second Milestone will be replacing the underlying Java SDK with a ZIO STTP Client,
-you will need to provide your own BodySerializer instance to use with STTP thereofre allowing you to choose which JSON library you would
+you will need to provide your own BodySerializer instance to use with STTP therefore allowing you to choose which JSON library you would
 like to use for processing.
 
 Using STTP will also mean you can use whatever HTTP Client implementation you feel comfortable with.
