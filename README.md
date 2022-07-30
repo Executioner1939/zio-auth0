@@ -1,5 +1,6 @@
-# Introduction
+**NB This Project is not yet Complete**
 
+# Introduction
 This library serves to be a simple wrapper around the Auth0 Java SDK, this is comptabile with the version 2 API which can be found here:
 [Auth0 Management API V2](https://auth0.com/docs/api/management/v2)
 

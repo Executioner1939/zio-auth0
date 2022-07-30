@@ -1,9 +1,7 @@
 package com.skunkworks.modules.tickets
 
-import com.auth0.json.mgmt.EmailVerificationIdentity
-import com.auth0.json.mgmt.tickets.{PasswordChangeTicket, EmailVerificationTicket}
+import com.auth0.json.mgmt.tickets.{EmailVerificationTicket, PasswordChangeTicket}
 import com.skunkworks.core.Client
-import com.skunkworks.modules.tickets.domain.EmailVerificationTicketRequest
 import zio.Task
 
 case class TicketService(client: Client) {
@@ -12,7 +10,7 @@ case class TicketService(client: Client) {
    * Create an Email Verification Ticket. A token with scope create:user_tickets is needed.
    * See https://auth0.com/docs/api/management/v2#!/Tickets/post_email_verification
    *
-   * @param userId                 the user ID of for whom the ticket should be created.
+   * @param userId                 ID for whom the ticket should be created.
    * @param resultUrl              URL the user will be redirected to in the classic Universal Login experience once the ticket is used.
    * @param ttlSec                 Number of seconds for which the ticket is valid before expiration. If unspecified or set to 0, this
    *                               value defaults to 432000 seconds (5 days).
@@ -33,12 +31,11 @@ case class TicketService(client: Client) {
       .map(_.getTicket)
   }
 
-
   /**
    * Create an Email Verification Ticket. A token with scope create:user_tickets is needed.
    * See https://auth0.com/docs/api/management/v2#!/Tickets/post_email_verification
    *
-   * @param userId                 the user ID of for whom the ticket should be created.
+   * @param userId                 ID for whom the ticket should be created.
    * @param clientId               ID of the client. If provided for tenants using New Universal Login experience, the user will be prompted
    *                               to redirect to the default login route of the corresponding application once the ticket is used.
    * @param organizationId         the ID of the Organization. If provided, organization parameters will be made available to the email
@@ -65,12 +62,11 @@ case class TicketService(client: Client) {
       .map(_.getTicket)
   }
 
-
   /**
    * Create a Password Change Ticket. A token with scope create:user_tickets is needed.
    * See https://auth0.com/docs/api/management/v2#!/Tickets/post_password_change
    *
-   * @param userId                 ID of for whom the ticket should be created.
+   * @param userId                 ID for whom the ticket should be created.
    * @param clientId               ID of the client. If provided for tenants using New Universal Login experience, the user
    *                               will be prompted to redirect to the default login route of the corresponding application
    *                               once the ticket is used.
@@ -103,7 +99,7 @@ case class TicketService(client: Client) {
    * Create a Password Change Ticket. A token with scope create:user_tickets is needed.
    * See https://auth0.com/docs/api/management/v2#!/Tickets/post_password_change
    *
-   * @param userId                 ID of for whom the ticket should be created.
+   * @param userId                 ID for whom the ticket should be created.
    * @param resultUrl              URL the user will be redirected to in the classic Universal Login experience once the ticket is used.
    * @param ttlSec                 Number of seconds for which the ticket is valid before expiration. If unspecified or set to 0, this
    *                               value defaults to 432000 seconds (5 days).
@@ -130,7 +126,7 @@ case class TicketService(client: Client) {
    * Create a Password Change Ticket. A token with scope create:user_tickets is needed.
    * See https://auth0.com/docs/api/management/v2#!/Tickets/post_password_change
    *
-   * @param connectionId           ID of for whom the ticket should be created.
+   * @param connectionId           ID for whom the ticket should be created.
    * @param emailAddress           URL the user will be redirected to in the classic Universal Login experience once the ticket is used.
    * @param clientId               ID of the client. If provided for tenants using New Universal Login experience, the user
    *                               will be prompted to redirect to the default login route of the corresponding application
