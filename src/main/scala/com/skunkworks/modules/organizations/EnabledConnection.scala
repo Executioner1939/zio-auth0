@@ -1,6 +1,6 @@
 package com.skunkworks.modules.organizations
 
-import com.auth0.json.mgmt.organizations.{ EnabledConnection => JEnabledConnection }
+import com.auth0.json.mgmt.organizations.{EnabledConnection => JEnabledConnection}
 import com.skunkworks.modules.organizations.Connection._
 
 final case class EnabledConnection(connection: Connection,

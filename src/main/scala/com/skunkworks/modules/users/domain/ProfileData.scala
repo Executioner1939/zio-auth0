@@ -1,5 +1,5 @@
 package com.skunkworks.modules.users.domain
-import com.auth0.json.mgmt.users.{ ProfileData => JProfileData }
+import com.auth0.json.mgmt.users.{ProfileData => JProfileData}
 final case class ProfileData(email: String,
                              email_verified: Boolean,
                              name: String,

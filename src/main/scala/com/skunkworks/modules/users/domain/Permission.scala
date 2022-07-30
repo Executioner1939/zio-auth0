@@ -1,7 +1,8 @@
 package com.skunkworks.modules.users.domain
-import com.auth0.json.mgmt.{ Permission => JPermission }
-import scala.jdk.CollectionConverters._
+import com.auth0.json.mgmt.{Permission => JPermission}
 import com.skunkworks.modules.users.domain.PermissionSource._
+
+import scala.jdk.CollectionConverters._
 
 final case class Permission(permission_name: String,
                             description: String,

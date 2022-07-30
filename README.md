@@ -24,12 +24,12 @@ The status of each of the API endpoints is documented below:
 | Organizations      | TODO                  |
 | Prompts            | TODO                  |
 | Resource Servers   | TODO                  |
-| Roles              | In Progress           |
+| Roles              | Done                  |
 | Rules              | TODO                  |
 | Rules Config       | TODO                  |
 | User Blocks        | In Progress           |
 | Users              | In Progress           |
-| Users By Email     | In Progress           |
+| Users By Email     | Done                  |
 | Actions            | TODO                  |
 | Attack Protection  | TODO                  |
 | Blacklists         | TODO                  |

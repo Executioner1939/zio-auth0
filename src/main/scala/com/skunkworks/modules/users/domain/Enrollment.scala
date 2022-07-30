@@ -1,7 +1,8 @@
 package com.skunkworks.modules.users.domain
 
-import java.time.{LocalDate, LocalDateTime, ZoneId}
 import com.auth0.json.mgmt.guardian.{Enrollment => JEnrollment}
+
+import java.time.{LocalDateTime, ZoneId}
 
 final case class Enrollment(id: String,
                             status: String,

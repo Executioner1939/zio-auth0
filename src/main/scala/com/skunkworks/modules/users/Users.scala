@@ -1,65 +1,34 @@
 package com.skunkworks.modules.users
 
-import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, PageFilter => JPageFilter, UserFilter => JUserFilter}
+import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, UserFilter => JUserFilter}
 import com.auth0.json.mgmt.organizations.OrganizationsPage
 import com.auth0.json.mgmt.users.{User => JUser}
 import com.skunkworks.core.Client
-import com.skunkworks.modules.domain.PageFilter._
-import com.skunkworks.modules.domain.{FieldsFilter, PageFilter}
+import com.skunkworks.modules.domain.LogEvent._
+import com.skunkworks.modules.domain.{FieldsFilter, LogEvent, LogEventFilter, PageFilter}
+import com.skunkworks.modules.implicits.JavaConversions._
 import com.skunkworks.modules.roles.domain.Role
+import com.skunkworks.modules.roles.domain.Role._
 import com.skunkworks.modules.users.domain.Identity._
 import com.skunkworks.modules.users.domain.Permission._
 import com.skunkworks.modules.users.domain.User._
-import com.skunkworks.modules.users.domain.UserFilter._
 import com.skunkworks.modules.users.domain._
-import com.skunkworks.modules.roles.domain.Role._
-import zio.{Task, ZIO}
+import zio.Task
 
 import scala.jdk.CollectionConverters._
 
 final case class Users(client: Client) {
 
-  private def toUserFilter(filter: UserFilter): JUserFilter = {
-    new JUserFilter()
-      .ifSome(filter.includeTotals)(_.withTotals(_))
-      .ifSome(filter.searchEngineVersion)(_.withSearchEngine(_))
-      .ifSome(filter.sort)(_.withSort(_))
-      .ifSome(filter.query)(_.withQuery(_))
-      .ifSome(filter.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
-      .ifSome(filter.fields)((a, b) => a.withFields(b.fields, b.includeFields))
-  }
-
-
-  private def toPageFilter(filter: PageFilter): JPageFilter = {
-    new JPageFilter()
-      .ifSome(filter.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
-      .ifSome(filter.from)(_.withFrom(_))
-      .ifSome(filter.take)(_.withTake(_))
-      .ifSome(filter.totals)(_.withTotals(_))
-  }
-
-
-  def create(user: User.Create): Task[JUser] = {
-    val body = new JUser(user.connection)
-    body.setGivenName(user.given_name)
-    body.setFamilyName(user.family_name)
-    body.setName(user.name.orNull)
-    body.setNickname(user.nickname.orNull)
-    body.setUsername(user.username.orNull)
-    body.setEmail(user.email)
-    body.setVerifyEmail(user.verify_email)
-    body.setPhoneNumber(user.phone_number)
-    body.setPhoneVerified(user.phone_verified)
-    body.setConnection(user.connection)
-    body.setBlocked(user.blocked)
-    body.setAppMetadata(user.app_metadata.map(_.asJava).orNull)
-    body.setUserMetadata(user.user_metadata.map(_.asJava).orNull)
-    body.setPicture(user.picture.map(_.toString).orNull)
-    body.setId(user.user_id.orNull)
-    body.setPassword(user.password.orNull)
-
-    client.execute(() => client.management.users().create(body))
-  }
+  /**
+   * Create a User.
+   * A token with scope create:users is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/post_users
+   *
+   * @param user the user data to set
+   * @return a Request to execute.
+   */
+  def create(user: User.Create): Task[JUser] = client
+    .execute(() => client.management.users().create(user.toJava))
 
   /**
    * Request all the Users.
@@ -71,11 +40,26 @@ final case class Users(client: Client) {
    * @return a Request to execute.
    */
   def list(filters: Option[UserFilter]): Task[List[User]] = {
-    val params = filters.fold(new JUserFilter())(toUserFilter)
+    val params = filters.fold(new JUserFilter())(_.toJava)
 
     client
       .execute(() => client.management.users().list(params))
       .map(_.getItems.asScala.map(_.convert).toList)
+  }
+
+  /**
+   * Request all the Events Log for a given User.
+   * A token with scope read:logs is needed.
+   * See https://auth0.com/docs/api/management/v2#!/Users/get_logs_by_user
+   *
+   * @param userId  the id of the user to retrieve.
+   * @param filters the filter to use.
+   * @return a Request to execute.
+   */
+  def getLogEvents(userId: String, filters: LogEventFilter): Task[List[LogEvent]] = {
+    client
+      .execute(() => client.management.users().getLogEvents(userId, filters.toJava))
+      .map(_.getItems.asScala.map(_.toScala).toList)
   }
 
   /**
@@ -110,7 +94,7 @@ final case class Users(client: Client) {
    */
   def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
     client
-      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(toUserFilter)))
+      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
       .map(_.convert)
   }
 
@@ -132,7 +116,7 @@ final case class Users(client: Client) {
    */
   def listPermissions(userId: String, pageFilter: PageFilter): Task[List[Permission]] = {
     client
-      .execute(() => client.management.users().listPermissions(userId, toPageFilter(pageFilter)))
+      .execute(() => client.management.users().listPermissions(userId, pageFilter.toJava))
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 
@@ -186,7 +170,7 @@ final case class Users(client: Client) {
    */
   def listRoles(userId: String, pageFilter: PageFilter): Task[List[Role]] = {
     client
-      .execute(() => client.management.users().listRoles(userId, toPageFilter(pageFilter)))
+      .execute(() => client.management.users().listRoles(userId, pageFilter.toJava))
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 
@@ -274,9 +258,8 @@ final case class Users(client: Client) {
    */
   def getOrganisation(userId: String, pageFilter: PageFilter): Task[OrganizationsPage] = {
     client
-      .execute(() => client.management.users().getOrganizations(userId, toPageFilter(pageFilter)))
+      .execute(() => client.management.users().getOrganizations(userId, pageFilter.toJava))
   }
-
 
   // ************************************************************************************************************************************ //
   // ************************************************************************************************************************************ //

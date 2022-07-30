@@ -1,5 +1,5 @@
 package com.skunkworks.modules.users.domain
-import com.auth0.json.mgmt.{ PermissionSource => JPermissionSource }
+import com.auth0.json.mgmt.{PermissionSource => JPermissionSource}
 
 final case class PermissionSource(source_type: String,
                                   source_name: String,
