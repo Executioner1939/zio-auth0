@@ -1,4 +1,4 @@
-**NB This Project is not yet Complete**
+**NB This Project is not yet complete**
 
 # Introduction
 This library serves to be a simple wrapper around the Auth0 Java SDK, this is comptabile with the version 2 API which can be found here:
