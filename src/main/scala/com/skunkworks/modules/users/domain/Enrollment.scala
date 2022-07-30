@@ -15,13 +15,13 @@ final case class Enrollment(id: String,
 object Enrollment {
   def fromJava(enrollment: JEnrollment): Enrollment = {
     Enrollment(
-      id           = enrollment.getId,
-      status       = enrollment.getStatus,
-      name         = enrollment.getStatus,
-      identifier   = enrollment.getIdentifier,
+      id = enrollment.getId,
+      status = enrollment.getStatus,
+      name = enrollment.getStatus,
+      identifier = enrollment.getIdentifier,
       phone_number = Option(enrollment.getPhoneNumber),
-      auth_method  = Option(enrollment.getAuthMethod),
-      enrolled_at  = Option(enrollment.getEnrolledAt).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime)
+      auth_method = Option(enrollment.getAuthMethod),
+      enrolled_at = Option(enrollment.getEnrolledAt).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime)
     )
   }
 }

@@ -1,4 +1,5 @@
 package com.skunkworks.modules.users.domain
+
 import com.auth0.json.mgmt.{Permission => JPermission}
 import com.skunkworks.modules.users.domain.PermissionSource._
 

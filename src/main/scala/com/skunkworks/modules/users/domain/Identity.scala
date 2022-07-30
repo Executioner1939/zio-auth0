@@ -14,12 +14,12 @@ object Identity {
   implicit class IdentityOps(underlying: JIdentity) {
     def convert: Identity = {
       Identity(
-        connection   = underlying.getConnection,
-        user_id      = underlying.getUserId,
-        provider     = underlying.getProvider,
-        isSocial     = underlying.isSocial,
+        connection = underlying.getConnection,
+        user_id = underlying.getUserId,
+        provider = underlying.getProvider,
+        isSocial = underlying.isSocial,
         access_token = Some(underlying.getAccessToken),
-        profileData  = Some(underlying.getProfileData).map(_.convert)
+        profileData = Some(underlying.getProfileData).map(_.convert)
       )
     }
   }

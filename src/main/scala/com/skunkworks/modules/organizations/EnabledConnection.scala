@@ -11,9 +11,9 @@ object EnabledConnection {
   implicit class EnabledConnectionOps(underlying: JEnabledConnection) {
     def toScala: EnabledConnection = {
       EnabledConnection(
-        connection                 = underlying.getConnection.toScala,
+        connection = underlying.getConnection.toScala,
         assign_membership_on_login = underlying.isAssignMembershipOnLogin,
-        connection_id              = underlying.getConnectionId
+        connection_id = underlying.getConnectionId
       )
     }
   }

@@ -17,7 +17,7 @@ import zio.Task
 
 import scala.jdk.CollectionConverters._
 
-final case class Users(client: Client) {
+final case class UsersService(client: Client) {
 
   /**
    * Create a User.
@@ -246,6 +246,9 @@ final case class Users(client: Client) {
       .execute(() => client.management.users().rotateRecoveryCode(userId))
       .map(_.getCode)
   }
+
+  client.management.userBlocks()
+  .
 
   /**
    * Get the organizations a user belongs to.

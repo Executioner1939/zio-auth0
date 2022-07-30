@@ -30,8 +30,8 @@ object Role {
   implicit class RoleOps(underlying: JRole) {
     def convert: Role = {
       Role(
-        id          = underlying.getId,
-        name        = underlying.getName,
+        id = underlying.getId,
+        name = underlying.getName,
         description = Option(underlying.getDescription)
       )
     }

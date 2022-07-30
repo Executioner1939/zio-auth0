@@ -27,8 +27,8 @@ The status of each of the API endpoints is documented below:
 | Roles              | Done                  |
 | Rules              | TODO                  |
 | Rules Config       | TODO                  |
-| User Blocks        | In Progress           |
-| Users              | In Progress           |
+| User Blocks        | Done                  |
+| Users              | Done                  |
 | Users By Email     | Done                  |
 | Actions            | TODO                  |
 | Attack Protection  | TODO                  |
@@ -42,7 +42,7 @@ The status of each of the API endpoints is documented below:
 | Tenants            | TODO                  |
 | Anomaly            | TODO                  |
 | Admin              | TODO                  |
-| Tickets            | In Progress           |
+| Tickets            | Done                  |
 
 ## Milestones
 

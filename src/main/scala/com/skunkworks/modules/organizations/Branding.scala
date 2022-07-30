@@ -1,8 +1,9 @@
 package com.skunkworks.modules.organizations
 
-import java.net.URL
 import com.auth0.json.mgmt.organizations.{Branding => JBranding}
 import com.skunkworks.modules.organizations.Colors._
+
+import java.net.URL
 
 final case class Branding(logo_url: Option[URL],
                           colors: Option[Colors])

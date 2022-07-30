@@ -3,15 +3,15 @@ package com.skunkworks.modules.roles
 import com.skunkworks.core.Client
 import com.skunkworks.modules.domain.PageFilter
 import com.skunkworks.modules.implicits.JavaConversions._
-import com.skunkworks.modules.roles.domain.{Role, RolesFilter}
 import com.skunkworks.modules.roles.domain.Role._
+import com.skunkworks.modules.roles.domain.{Role, RolesFilter}
 import com.skunkworks.modules.users.domain.Permission
 import com.skunkworks.modules.users.domain.Permission._
 import zio.{Task, ZIO}
 
 import scala.jdk.CollectionConverters._
 
-case class Roles(client: Client) {
+case class RoleService(client: Client) {
 
   /**
    * Create a Role.

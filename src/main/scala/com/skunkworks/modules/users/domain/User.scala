@@ -67,20 +67,20 @@ object User {
     }
   }
 
-  final case class Update(given_name: Option[String]= None,
-                          family_name: Option[String]= None,
-                          name: Option[String]= None,
-                          email: Option[String]= None,
-                          verify_email: Option[Boolean]= None,
-                          email_verified: Option[Boolean]= None,
-                          phone_number: Option[String]= None,
-                          phone_verified: Option[Boolean]= None,
-                          username: Option[String]= None,
-                          connection: Option[String]= None,
-                          blocked: Option[Boolean]= None,
-                          app_metadata: Option[Map[String, AnyRef]]= None,
-                          user_metadata: Option[Map[String, AnyRef]]= None,
-                          nickname: Option[String]= None,
+  final case class Update(given_name: Option[String] = None,
+                          family_name: Option[String] = None,
+                          name: Option[String] = None,
+                          email: Option[String] = None,
+                          verify_email: Option[Boolean] = None,
+                          email_verified: Option[Boolean] = None,
+                          phone_number: Option[String] = None,
+                          phone_verified: Option[Boolean] = None,
+                          username: Option[String] = None,
+                          connection: Option[String] = None,
+                          blocked: Option[Boolean] = None,
+                          app_metadata: Option[Map[String, AnyRef]] = None,
+                          user_metadata: Option[Map[String, AnyRef]] = None,
+                          nickname: Option[String] = None,
                           picture: Option[URI] = None) {
     def toJava: JUser = {
       val user = new JUser()

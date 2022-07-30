@@ -1,4 +1,5 @@
 package com.skunkworks.modules.users.domain
+
 import com.auth0.json.mgmt.{PermissionSource => JPermissionSource}
 
 final case class PermissionSource(source_type: String,
@@ -11,7 +12,7 @@ object PermissionSource {
       PermissionSource(
         source_type = underlying.getType,
         source_name = underlying.getName,
-        source_id   = underlying.getId
+        source_id = underlying.getId
       )
     }
   }
