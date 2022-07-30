@@ -6,7 +6,7 @@ final case class ProfileData(email: String,
                              username: String,
                              given_name: String,
                              phone_number: String,
-                             phone_verified: String,
+                             phone_verified: Boolean,
                              family_name: String)
 
 object ProfileData {

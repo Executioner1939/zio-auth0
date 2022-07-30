@@ -6,7 +6,7 @@ final case class Colors(primary: String,
                         page_background: String)
 
 object Colors {
-  implicit class Colors(underlying: JColors) {
+  implicit class ColorsOps(underlying: JColors) {
     def asScala: Colors = {
       Colors(
         primary = underlying.getPrimary,

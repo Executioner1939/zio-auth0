@@ -15,8 +15,8 @@ final case class User(given_name: String,
                       phone_verified: Boolean,
                       username: Option[String],
                       blocked: Boolean,
-                      app_metadata: Map[String, Any],
-                      user_metadata: Map[String, Any],
+                      app_metadata: Option[Map[String, Any]],
+                      user_metadata: Option[Map[String, Any]],
                       nickname: Option[String],
                       picture: Option[URI],
                       user_id: String,
@@ -90,11 +90,11 @@ object User {
       user.setNickname(nickname.orNull)
       user.setUsername(username.orNull)
       user.setEmail(email.orNull)
-      user.setVerifyEmail(verify_email.orNull)
+      user.setVerifyEmail(verify_email.exists(_.booleanValue()))
       user.setPhoneNumber(phone_number.orNull)
-      user.setPhoneVerified(phone_verified.orNull)
+      user.setPhoneVerified(phone_verified.exists(_.booleanValue()))
       user.setConnection(connection.orNull)
-      user.setBlocked(blocked.orNull)
+      user.setBlocked(blocked.exists(_.booleanValue()))
       user.setAppMetadata(app_metadata.map(_.asJava).orNull)
       user.setUserMetadata(user_metadata.map(_.asJava).orNull)
       user.setPicture(picture.map(_.toString).orNull)
@@ -114,12 +114,12 @@ object User {
         phone_verified = underlying.isPhoneVerified,
         username = Some(underlying.getUsername),
         blocked = underlying.isBlocked,
-        app_metadata = Some(underlying.getAppMetadata).map(_.asScala),
-        user_metadata = Some(underlying.getUserMetadata),
+        app_metadata = Some(underlying.getAppMetadata).map(_.asScala.toMap),
+        user_metadata = Some(underlying.getUserMetadata).map(_.asScala.toMap),
         nickname = Some(underlying.getNickname),
-        picture = Some(underlying.getPicture),
+        picture = Some(underlying.getPicture).map(URI.create),
         user_id = underlying.getId,
-        multifactor = Some(underlying.getMultifactor).map(_.asScala),
+        multifactor = Some(underlying.getMultifactor).map(_.asScala.toList),
         last_ip = Some(underlying.getLastIP),
         last_login = Some(underlying.getLastLogin).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime),
         logins_count = Some(underlying.getLoginsCount),

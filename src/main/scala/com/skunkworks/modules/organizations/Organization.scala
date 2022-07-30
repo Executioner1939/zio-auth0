@@ -2,6 +2,7 @@ package com.skunkworks.modules.organizations
 
 import com.auth0.json.mgmt.organizations.{Organization => JOrganization}
 import com.skunkworks.modules.organizations.EnabledConnection._
+import com.skunkworks.modules.organizations.Branding._
 
 import scala.jdk.CollectionConverters._
 
