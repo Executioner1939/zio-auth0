@@ -56,6 +56,7 @@ ThisBuild / developers                := List(
 )
 
  // SBT Release
+ThisBuild / publishArtifact               := true
 ThisBuild / releaseCommitMessage          := s"[skip ci] Setting version to ${(ThisBuild / version).value}"
 ThisBuild / releaseNextCommitMessage      := s"[skip ci] Setting version to ${(ThisBuild / version).value}"
 ThisBuild / releaseIgnoreUntrackedFiles   := true
