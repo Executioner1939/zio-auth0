@@ -5,10 +5,10 @@ import sbtrelease.Version
 import xerial.sbt.Sonatype.GitHubHosting
 
 lazy val global = Seq(
-  ThisBuild / scalaVersion     := "2.13.8",
-  ThisBuild / organization     := "io.bitlevel",
-  ThisBuild / organizationName := "bitlevel",
-  ThisBuild / scalacOptions    ++= Seq(
+  scalaVersion     := "2.13.8",
+  organization     := "io.bitlevel",
+  organizationName := "bitlevel",
+  scalacOptions    ++= Seq(
     "-Ywarn-unused:implicits",
     "-Ywarn-unused:imports",
     "-Ywarn-unused:locals",
@@ -29,14 +29,14 @@ lazy val global = Seq(
   ),
 
   // SBT Sonatype
-  ThisBuild / sonatypeProfileName       := "io.bitlevel",
-  ThisBuild / publishTo                 := sonatypePublishToBundle.value,
-  ThisBuild / publishConfiguration      := publishConfiguration.value.withOverwrite(true),
-  ThisBuild / publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
-  ThisBuild / publishMavenStyle         := true,
-  ThisBuild / licenses                  := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
-  ThisBuild / sonatypeProjectHosting    := Some(GitHubHosting("Executioner1939", "zio-auth0", "shadowrhyder@gmail.com")),
-  ThisBuild / developers                := List(
+  sonatypeProfileName       := "io.bitlevel",
+  publishTo                 := sonatypePublishToBundle.value,
+  publishConfiguration      := publishConfiguration.value.withOverwrite(true),
+  publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
+  publishMavenStyle         := true,
+  licenses                  := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
+  sonatypeProjectHosting    := Some(GitHubHosting("Executioner1939", "zio-auth0", "shadowrhyder@gmail.com")),
+  developers                := List(
     Developer(
       id    = "Executioner1939",
       name  = "Richard Peters",
@@ -46,13 +46,13 @@ lazy val global = Seq(
   ),
 
   // SBT Release
-  ThisBuild / releaseCommitMessage := s"[skip ci] Setting version to ${(ThisBuild / version).value}",
-  ThisBuild / releaseNextCommitMessage := s"[skip ci] Setting version to ${(ThisBuild / version).value}",
-  ThisBuild / releaseIgnoreUntrackedFiles := true,
-  ThisBuild / releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  ThisBuild / releaseCrossBuild := false,
-  ThisBuild / releaseVersionBump := Version.Bump.Minor,
-  ThisBuild / releaseProcess := Seq[ReleaseStep](
+  releaseCommitMessage := s"[skip ci] Setting version to ${(ThisBuild / version).value}",
+  releaseNextCommitMessage := s"[skip ci] Setting version to ${(ThisBuild / version).value}",
+  releaseIgnoreUntrackedFiles := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  releaseCrossBuild := false,
+  releaseVersionBump := Version.Bump.Minor,
+  releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
     runClean,
