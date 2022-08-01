@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   publish_and_release:
     docker:
-      - image: cimg/openjdk:latest
+      - image: circleci/openjdk:latest
     working_directory: ~/code
     steps:
       - checkout
