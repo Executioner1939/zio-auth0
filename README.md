@@ -1,6 +1,6 @@
 # keycloak4s
 [![CircleCI](https://circleci.com/gh/Executioner1939/zio-auth0.svg?style=shield&circle-token=0788f14be0abb7f8ab8194fbd2cd179122b3ee85)](https://circleci.com/gh/Executioner1939/zio-auth0)
-[![Maven Central](https://img.shields.io/maven-central/v/io.bitlevel/zio-auth0_2.13.svg)](https://search.maven.org/search?q=a:zio-auth0_2.13)
+[![Maven Central](https://img.shields.io/maven-central/v/io.bitlevel/zio-auth0_2.13.svg)](https://search.maven.org/search?q=a:zio-auth0)
 
 
 **NB This Project is not yet complete**
@@ -16,31 +16,40 @@ complete the rest of the endpoints will be implemented.
 
 The status of each of the API endpoints is documented below:
 
+### Users
+
+| API                | Implementation Status |
+|--------------------|-----------------------|
+| Connections        | In Progress           |
+| Organizations      | TODO                  |
+| Roles              | Done                  |
+| User Blocks        | Done                  |
+| Users              | Done                  |
+| Users By Email     | Done                  |
+| Blacklists         | TODO                  |
+| Stats              | TODO                  |
+| Tenants            | TODO                  |
+| Anomaly            | TODO                  |
+| Tickets            | Done                  |
+
+### Administration
 | API                | Implementation Status |
 |--------------------|-----------------------|
 | Client Grants      | TODO                  |
 | Clients            | TODO                  |
-| Connections        | In Progress           |
 | Custom Domains     | TODO                  |
 | Device Credentials | TODO                  |
 | Grants             | TODO                  |
 | Hooks              | TODO                  |
 | Log Streams        | TODO                  |
 | Logs               | TODO                  |
-| Organizations      | TODO                  |
 | Prompts            | TODO                  |
 | Resource Servers   | TODO                  |
-| Roles              | Done                  |
 | Rules              | TODO                  |
 | Rules Config       | TODO                  |
-| User Blocks        | Done                  |
-| Users              | Done                  |
-| Users By Email     | Done                  |
 | Actions            | TODO                  |
 | Attack Protection  | TODO                  |
 | Blacklists         | TODO                  |
-| Email Templates    | TODO                  |
-| Emails             | TODO                  |
 | Guardian           | TODO                  |
 | Jobs               | TODO                  |
 | Keys               | TODO                  |
@@ -48,7 +57,6 @@ The status of each of the API endpoints is documented below:
 | Tenants            | TODO                  |
 | Anomaly            | TODO                  |
 | Admin              | TODO                  |
-| Tickets            | Done                  |
 
 ## Milestones
 
