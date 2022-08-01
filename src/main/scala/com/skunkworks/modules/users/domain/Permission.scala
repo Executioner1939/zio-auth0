@@ -9,21 +9,17 @@ final case class Permission(permission_name: String,
                             description: String,
                             resource_server_identifier: String,
                             resource_server_name: String,
-                            sources: List[PermissionSource]) {
-
-  def toJPermission: JPermission = {
-    val permission = new JPermission
-    permission.setName(permission_name)
-    permission.setDescription(description)
-    permission.setResourceServerId(resource_server_identifier)
-    permission.setResourceServerName(resource_server_name)
-    permission
-  }
-}
+                            sources: List[PermissionSource])
 
 object Permission {
-  implicit class PermissionOps(underlying: JPermission) {
-    def convert: Permission = {
+  final case class Create(permission_name: String,
+                          description: String,
+                          resource_server_identifier: String,
+                          resource_server_name: String)
+
+
+  implicit class PermissionOps0(underlying: JPermission) {
+    def toScala: Permission = {
       Permission(
         permission_name = underlying.getName,
         description = underlying.getDescription,
@@ -34,16 +30,24 @@ object Permission {
     }
   }
 
-  final case class Create(permission_name: String,
-                          description: String,
-                          resource_server_identifier: String,
-                          resource_server_name: String) {
-    def toJPermission: JPermission = {
+  implicit class PermissionOps1(underlying: Permission.Create) {
+    def toJava: JPermission = {
       val permission = new JPermission()
-      permission.setName(permission_name)
-      permission.setDescription(description)
-      permission.setResourceServerId(resource_server_identifier)
-      permission.setResourceServerName(resource_server_name)
+      permission.setName(underlying.permission_name)
+      permission.setDescription(underlying.description)
+      permission.setResourceServerId(underlying.resource_server_identifier)
+      permission.setResourceServerName(underlying.resource_server_name)
+      permission
+    }
+  }
+
+  implicit class PermissionOps2(underlying: Permission) {
+    def toJava: JPermission = {
+      val permission = new JPermission()
+      permission.setName(underlying.permission_name)
+      permission.setDescription(underlying.description)
+      permission.setResourceServerId(underlying.resource_server_identifier)
+      permission.setResourceServerName(underlying.resource_server_name)
       permission
     }
   }

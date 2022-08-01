@@ -5,12 +5,18 @@ import com.skunkworks.modules.users.domain.UserBlocks
 import com.skunkworks.modules.users.domain.UserBlocks._
 import zio.Task
 
+/**
+ * Class that provides an implementation of the User Blocks methods of the Management API.
+ *
+ * @see https://auth0.com/docs/api/management/v2#!/User_Blocks
+ * @param client the underlying HTTP Client
+ */
 case class UserBlocksService(client: Client) {
 
   /**
    * Request all the User Blocks. A token with scope read:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/User_Blocks/get_user_blocks_by_id
    *
+   * @see https://auth0.com/docs/api/management/v2#!/User_Blocks/get_user_blocks_by_id
    * @param userId the user id.
    * @return a Request to execute.
    */
@@ -22,8 +28,8 @@ case class UserBlocksService(client: Client) {
 
   /**
    * Delete any existing User Blocks. A token with scope update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/User_Blocks/delete_user_blocks_by_id
    *
+   * @see https://auth0.com/docs/api/management/v2#!/User_Blocks/delete_user_blocks_by_id
    * @param userId the user id.
    * @return a Request to execute.
    */
@@ -35,8 +41,8 @@ case class UserBlocksService(client: Client) {
 
   /**
    * Request all the User Blocks for a given identifier. A token with scope read:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/User_Blocks/get_user_blocks
    *
+   * @see https://auth0.com/docs/api/management/v2#!/User_Blocks/get_user_blocks
    * @param identifier the identifier. Either a username, phone_number, or email.
    * @return a Request to execute.
    */
@@ -48,8 +54,8 @@ case class UserBlocksService(client: Client) {
 
   /**
    * Delete any existing User Blocks for a given identifier. A token with scope update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/User_Blocks/delete_user_blocks
    *
+   * @see https://auth0.com/docs/api/management/v2#!/User_Blocks/delete_user_blocks
    * @param identifier the identifier. Either a username, phone_number, or email.
    * @return a Request to execute.
    */

@@ -17,13 +17,20 @@ import zio.Task
 
 import scala.jdk.CollectionConverters._
 
+/**
+ * Class that provides an implementation of the Users methods of the Management API.
+ *
+ * @see https://auth0.com/docs/api/management/v2#!/Users
+ * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email
+ * @param client the underlying HTTP Client
+ */
 final case class UsersService(client: Client) {
 
   /**
    * Create a User.
    * A token with scope create:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/post_users
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/post_users
    * @param user the user data to set
    * @return a Request to execute.
    */
@@ -34,8 +41,8 @@ final case class UsersService(client: Client) {
    * Request all the Users.
    * A token with scope read:users is needed.
    * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_users
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_users
    * @param filters the filter to use. Can be null.
    * @return a Request to execute.
    */
@@ -50,24 +57,22 @@ final case class UsersService(client: Client) {
   /**
    * Request all the Events Log for a given User.
    * A token with scope read:logs is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_logs_by_user
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_logs_by_user
    * @param userId  the id of the user to retrieve.
    * @param filters the filter to use.
    * @return a Request to execute.
    */
-  def getLogEvents(userId: String, filters: LogEventFilter): Task[List[LogEvent]] = {
-    client
-      .execute(() => client.management.users().getLogEvents(userId, filters.toJava))
-      .map(_.getItems.asScala.map(_.toScala).toList)
-  }
+  def getLogEvents(userId: String, filters: LogEventFilter): Task[List[LogEvent]] = client
+    .execute(() => client.management.users().getLogEvents(userId, filters.toJava))
+    .map(_.getItems.asScala.map(_.toScala).toList)
 
   /**
    * Request all the Users that match a given email.
    * A token with scope read:users is needed.
    * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
-   * See https://auth0.com/docs/api/management/v2#!/Users_By_Email/get_users_by_email
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email/get_users_by_email
    * @param emailAddress the email of the users to look up.
    * @param filter       the filter to use. Can be null.
    * @return a Request to execute.
@@ -86,17 +91,15 @@ final case class UsersService(client: Client) {
    * Request a User.
    * A token with scope read:users is needed.
    * If you want the identities.access_token property to be included, you will also need the scope read:user_idp_tokens.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_users_by_id
    * @param userId  the id of the user to retrieve.
    * @param filters the filter to use. Can be null.
    * @return a Request to execute.
    */
-  def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
-    client
-      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
-      .map(_.convert)
-  }
+  def getById(userId: String, filters: Option[UserFilter]): Task[User] = client
+    .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
+    .map(_.convert)
 
 
   // ************************************************************************************************************************************ //
@@ -108,47 +111,47 @@ final case class UsersService(client: Client) {
   /**
    * Get the permissions associated to the user.
    * A token with read:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_permissions
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_permissions
    * @param userId the role id
    * @param filter an optional pagination filter
    * @return a Request to execute
    */
-  def listPermissions(userId: String, pageFilter: PageFilter): Task[List[Permission]] = {
-    client
-      .execute(() => client.management.users().listPermissions(userId, pageFilter.toJava))
-      .map(_.getItems.asScala.map(_.convert).toList)
-  }
+  def listPermissions(userId: String, pageFilter: PageFilter): Task[List[Permission]] = client
+    .execute(() => client.management.users().listPermissions(userId, pageFilter.toJava))
+    .map(_.getItems.asScala.map(_.toScala).toList)
 
   /**
    * Assign permissions to a user.
    * A token with update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/post_permissions
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/post_permissions
    * @param userId      the user id
    * @param permissions a list of permission objects to assign to the user
    * @return a Request to execute
    */
   def addPermissions(userId: String, permissions: List[Permission.Create]): Task[Unit] = {
-    val perms = permissions.map(_.toJPermission).asJava
+    val perms = permissions.map(_.toJava)
 
     client
-      .execute(() => client.management.users().addPermissions(userId, perms))
+      .execute(() => client.management.users().addPermissions(userId, perms.asJava))
       .unit
   }
 
   /**
    * Remove permissions from a user.
    * A token with update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/delete_permissions
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/delete_permissions
    * @param userId      the user id
    * @param permissions a list of permission objects to remove from the user
    * @return a Request to execute
    */
   def removePermissions(userId: String, permissions: List[Permission]): Task[Unit] = {
+    val perms = permissions.map(_.toJava)
+
     client
-      .execute(() => client.management.users().removePermissions(userId, permissions.map(_.toJPermission).asJava))
+      .execute(() => client.management.users().removePermissions(userId, perms.asJava))
       .unit
   }
 
@@ -162,8 +165,8 @@ final case class UsersService(client: Client) {
   /**
    * Get the roles associated with a user.
    * A token with read:users and read:roles is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
    * @param userId     the role id
    * @param pageFilter an optional pagination filter
    * @return a Request to execute
@@ -177,8 +180,8 @@ final case class UsersService(client: Client) {
   /**
    * Assign roles to a user.
    * A token with update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
    * @param userId   the user id
    * @param rolesIds a list of role ids to assign to the user
    * @return a Request to execute
@@ -192,8 +195,8 @@ final case class UsersService(client: Client) {
   /**
    * Remove roles from a user.
    * A token with update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
    * @param userId  the user id
    * @param roleIds a list of role ids to remove from the user
    * @return a Request to execute
@@ -207,8 +210,8 @@ final case class UsersService(client: Client) {
   /**
    * Delete an existing User.
    * A token with scope delete:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/delete_users_by_id
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/delete_users_by_id
    * @param userId the user id
    * @return a Request to execute.
    */
@@ -221,8 +224,8 @@ final case class UsersService(client: Client) {
   /**
    * Delete an existing User's Multifactor Provider.
    * A token with scope update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/delete_multifactor_by_provider
    * @param userId   the user id
    * @param provider the multifactor provider
    * @return a Request to execute.
@@ -247,9 +250,6 @@ final case class UsersService(client: Client) {
       .map(_.getCode)
   }
 
-  client.management.userBlocks()
-  .
-
   /**
    * Get the organizations a user belongs to.
    * A token with {@code read:users} and {@code read:organizations} is required.
@@ -273,8 +273,8 @@ final case class UsersService(client: Client) {
   /**
    * A token with scope update:current_user_identities is needed.
    * It only works for the user the access token represents.
-   * See https://auth0.com/docs/api/management/v2#!/Users/post_identities
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/post_identities
    * @param primaryUserId    the primary identity's user id associated with the access token this client was configured with.
    * @param secondaryIdToken the user ID token representing the identity to link with the current user
    * @return a Request to execute.
@@ -288,8 +288,8 @@ final case class UsersService(client: Client) {
   /**
    * Links two User's Identities.
    * A token with scope update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/post_identities
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/post_identities
    * @param primaryUserId   the primary identity's user id
    * @param secondaryUserId the secondary identity's user id
    * @param provider        the provider name of the secondary identity.
@@ -305,8 +305,8 @@ final case class UsersService(client: Client) {
   /**
    * Un-links two User's Identities.
    * A token with scope update:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
    * @param primaryUserId   the primary identity's user id
    * @param secondaryUserId the secondary identity's user id
    * @param provider        the provider name of the secondary identity.
@@ -319,10 +319,10 @@ final case class UsersService(client: Client) {
   }
 
   /**
-   * Retreive the first confirmed enrollment, or a pending enrollment if none are confirmed.
+   * Retrieve the first confirmed enrollment, or a pending enrollment if none are confirmed.
    * A token with scope read:users is needed.
-   * See https://auth0.com/docs/api/management/v2#!/Users/get_enrollments
    *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/get_enrollments
    * @param userId the id of the user to retrieve.
    * @return a Request to execute.
    */
