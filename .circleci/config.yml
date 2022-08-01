@@ -12,13 +12,8 @@ jobs:
           fingerprints:
             - "2f:63:7c:30:5f:96:d3:c1:69:43:ce:e1:ae:b3:b1:60"
       - run:
-          name: Import PGP Key
-          command: |
-            sudo rm -rf /var/lib/apt/lists/* && sudo apt-get update
-            sudo apt-get install -y dos2unix
-            echo -e "$PGP_SECRET" > key.asc
-            dos2unix key.asc
-            gpg --import key.asc
+          name: Import GPG Key
+          command: echo -e "$GPG_SECRET" | gpg --import
       - run:
           name: Set Git Config
           command: |
