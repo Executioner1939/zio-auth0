@@ -59,7 +59,7 @@ lazy val global = Seq(
     setReleaseVersion,
     tagRelease,
     pushChanges,
-    releaseStepCommandAndRemaining("+publishSigned"),
+    releaseStepCommandAndRemaining("publishSigned"),
     releaseStepCommand("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
