@@ -1,6 +1,6 @@
 package io.bitlevel.zio.auth0.modules.users.domain
 
-import io.bitlevel.zio.auth0.modules.domain.{Fields, Page}
+import io.bitlevel.zio.auth0.modules.domain.filters.{Fields, Page}
 
 final case class UserFilter(includeTotals: Option[Boolean] = None,
                             searchEngineVersion: Option[String] = None,

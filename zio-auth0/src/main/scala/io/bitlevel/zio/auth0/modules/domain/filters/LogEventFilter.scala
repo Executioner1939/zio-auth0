@@ -1,4 +1,4 @@
-package io.bitlevel.zio.auth0.modules.domain
+package io.bitlevel.zio.auth0.modules.domain.filters
 
 final case class LogEventFilter(checkpoint: Option[Checkpoint],
                                 includeTotals: Option[Boolean] = None,

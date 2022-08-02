@@ -1,7 +1,6 @@
 [![CircleCI](https://circleci.com/gh/Executioner1939/zio-auth0.svg?style=shield&circle-token=0788f14be0abb7f8ab8194fbd2cd179122b3ee85)](https://circleci.com/gh/Executioner1939/zio-auth0)
 [![Maven Central](https://img.shields.io/maven-central/v/io.bitlevel/zio-auth0_2.13.svg)](https://search.maven.org/search?q=a:zio-auth0)
 
-
 **NB This Project is not yet complete**
 
 # Introduction

@@ -1,7 +1,8 @@
 package io.bitlevel.zio.auth0.modules.organizations
 
 import com.auth0.json.mgmt.organizations.{EnabledConnection => JEnabledConnection}
-import io.bitlevel.zio.auth0.modules.organizations.Connection._
+import io.bitlevel.zio.auth0.modules.connections.domain.Connection
+import io.bitlevel.zio.auth0.modules.connections.domain.Connection._
 
 final case class EnabledConnection(connection: Option[Connection] = None,
                                    assign_membership_on_login: Option[Boolean] = None,
@@ -11,9 +12,9 @@ object EnabledConnection {
   implicit class EnabledConnectionOps0(underlying: JEnabledConnection) {
     def toScala: EnabledConnection = {
       EnabledConnection(
-        connection = Option(underlying.getConnection).map(_.toScala),
+        connection                 = Option(underlying.getConnection).map(_.toScala),
         assign_membership_on_login = Option(underlying.isAssignMembershipOnLogin),
-        connection_id = Option(underlying.getConnectionId)
+        connection_id              = Option(underlying.getConnectionId)
       )
     }
   }

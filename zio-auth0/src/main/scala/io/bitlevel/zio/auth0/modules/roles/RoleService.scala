@@ -1,7 +1,7 @@
 package io.bitlevel.zio.auth0.modules.roles
 
 import io.bitlevel.zio.auth0.core.Client
-import io.bitlevel.zio.auth0.modules.domain.PageFilter
+import io.bitlevel.zio.auth0.modules.domain.filters.PageFilter
 import io.bitlevel.zio.auth0.modules.implicits.JavaConversions._
 import io.bitlevel.zio.auth0.modules.roles.domain.Role._
 import io.bitlevel.zio.auth0.modules.roles.domain.{Role, RolesFilter}
