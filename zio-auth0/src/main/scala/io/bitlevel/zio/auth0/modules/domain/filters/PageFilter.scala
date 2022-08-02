@@ -1,9 +1,9 @@
-package io.bitlevel.zio.auth0.modules.domain
+package io.bitlevel.zio.auth0.modules.domain.filters
 
 import com.auth0.client.mgmt.filter.{PageFilter => JPageFilter}
 
 final case class PageFilter(page: Option[Page],
-                            totals: Option[Boolean],
+                            includeTotals: Option[Boolean],
                             from: Option[String],
                             take: Option[Int])
 

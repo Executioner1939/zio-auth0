@@ -5,7 +5,8 @@ import com.auth0.json.mgmt.organizations.OrganizationsPage
 import com.auth0.json.mgmt.users.{User => JUser}
 import io.bitlevel.zio.auth0.core.Client
 import io.bitlevel.zio.auth0.modules.domain.LogEvent._
-import io.bitlevel.zio.auth0.modules.domain.{FieldsFilter, LogEvent, LogEventFilter, PageFilter}
+import io.bitlevel.zio.auth0.modules.domain.filters.{FieldsFilter, LogEventFilter, PageFilter}
+import io.bitlevel.zio.auth0.modules.domain.LogEvent
 import io.bitlevel.zio.auth0.modules.implicits.JavaConversions._
 import io.bitlevel.zio.auth0.modules.roles.domain.Role
 import io.bitlevel.zio.auth0.modules.roles.domain.Role._

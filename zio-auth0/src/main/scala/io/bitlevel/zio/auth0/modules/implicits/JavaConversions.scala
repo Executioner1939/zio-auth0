@@ -1,7 +1,8 @@
 package io.bitlevel.zio.auth0.modules.implicits
 
-import com.auth0.client.mgmt.filter.{LogEventFilter => JLogEventFilter, PageFilter => JPageFilter, RolesFilter => JRolesFilter, UserFilter => JUserFilter}
-import io.bitlevel.zio.auth0.modules.domain.{LogEventFilter, PageFilter}
+import com.auth0.client.mgmt.filter.{LogEventFilter => JLogEventFilter, PageFilter => JPageFilter, RolesFilter => JRolesFilter, UserFilter => JUserFilter, ConnectionFilter => JConnectionFilter}
+import io.bitlevel.zio.auth0.modules.connections.domain.ConnectionFilter
+import io.bitlevel.zio.auth0.modules.domain.filters.{LogEventFilter, PageFilter}
 import io.bitlevel.zio.auth0.modules.roles.domain.RolesFilter
 import io.bitlevel.zio.auth0.modules.users.domain.UserFilter
 import io.bitlevel.zio.auth0.modules.users.domain.UserFilter.MaybeModifyOps
@@ -37,7 +38,7 @@ object JavaConversions {
         .ifSome(underlying.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
         .ifSome(underlying.from)(_.withFrom(_))
         .ifSome(underlying.take)(_.withTake(_))
-        .ifSome(underlying.totals)(_.withTotals(_))
+        .ifSome(underlying.includeTotals)(_.withTotals(_))
     }
   }
 
@@ -45,8 +46,19 @@ object JavaConversions {
     def toJava: JRolesFilter = {
       new JRolesFilter()
         .ifSome(underlying.name_filter)(_.withName(_))
-        .ifSome(underlying.totals)(_.withTotals(_))
+        .ifSome(underlying.includeTotals)(_.withTotals(_))
         .ifSome(underlying.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
+    }
+  }
+
+  implicit class ConnectionFilterOps(underlying: ConnectionFilter) {
+    def toJava: JConnectionFilter = {
+      new JConnectionFilter()
+        .ifSome(underlying.strategy)(_.withStrategy(_))
+        .ifSome(underlying.name)(_.withName(_))
+        .ifSome(underlying.includeTotals)(_.withTotals(_))
+        .ifSome(underlying.page)((a, b) => a.withPage(b.pageNumber, b.amountPerPage))
+        .ifSome(underlying.fields)((a, b) => a.withFields(b.fields, b.includeFields))
     }
   }
 }
