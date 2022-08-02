@@ -18,7 +18,7 @@ The status of each of the API endpoints is documented below:
 
 | API                | Implementation Status |
 |--------------------|-----------------------|
-| Connections        | In Progress           |
+| Connections        | Done                  |
 | Organizations      | TODO                  |
 | Roles              | Done                  |
 | User Blocks        | Done                  |
