@@ -80,7 +80,14 @@ val zio: Seq[ModuleID] = {
   Seq(
     "dev.zio" %% "zio"          % version,
     "dev.zio" %% "zio-test"     % version % Test,
-    "dev.zio" %% "zio-test-sbt" % version % Test
+    "dev.zio" %% "zio-test-sbt" % version % Test,
+    "dev.zio" %% "zio-config"   % "3.0.1" % Test
+  )
+}
+
+val `scalacheck-faker`: Seq[ModuleID] = {
+  Seq(
+    "io.github.etspaceman" %% "scalacheck-faker" % "7.0.0" % Test
   )
 }
 
@@ -90,7 +97,7 @@ val auth0: Seq[ModuleID] = Seq(
 
 lazy val `zio-auth0` = (project in file("./zio-auth0"))
   .settings(global: _*)
-  .settings(libraryDependencies ++= zio ++ auth0)
+  .settings(libraryDependencies ++= zio ++ auth0 ++ `scalacheck-faker`)
   .settings(name := "zio-auth0", publishArtifact := true)
 
 // ---------------------------------------------- //

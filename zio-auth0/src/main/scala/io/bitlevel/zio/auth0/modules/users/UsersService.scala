@@ -4,6 +4,7 @@ import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, UserFilter =
 import com.auth0.json.mgmt.organizations.OrganizationsPage
 import com.auth0.json.mgmt.users.{User => JUser}
 import io.bitlevel.zio.auth0.core.Client
+import io.bitlevel.zio.auth0.core.domain.Configuration
 import io.bitlevel.zio.auth0.modules.domain.LogEvent._
 import io.bitlevel.zio.auth0.modules.domain.filters.{FieldsFilter, LogEventFilter, PageFilter}
 import io.bitlevel.zio.auth0.modules.domain.LogEvent
@@ -14,7 +15,7 @@ import io.bitlevel.zio.auth0.modules.users.domain.Identity._
 import io.bitlevel.zio.auth0.modules.users.domain.Permission._
 import io.bitlevel.zio.auth0.modules.users.domain.User._
 import io.bitlevel.zio.auth0.modules.users.domain._
-import zio.Task
+import zio.{Task, UIO, URIO, URLayer, ZIO, ZLayer}
 
 import scala.jdk.CollectionConverters._
 
@@ -333,5 +334,11 @@ final case class UsersService(client: Client) {
     client
       .execute(() => client.management.users().getEnrollments(userId))
       .map(_.asScala.map(Enrollment.fromJava).toList)
+  }
+}
+
+object UsersService {
+  val layer: URLayer[Client, UsersService] = {
+    ZLayer(ZIO.service[Client].map(UsersService(_)))
   }
 }

@@ -1,8 +1,7 @@
 package io.bitlevel.zio.auth0.modules.organizations
 
 import com.auth0.json.mgmt.organizations.{EnabledConnection => JEnabledConnection}
-import io.bitlevel.zio.auth0.modules.connections.domain.Connection
-import io.bitlevel.zio.auth0.modules.connections.domain.Connection._
+import io.bitlevel.zio.auth0.modules.organizations.Connection._
 
 final case class EnabledConnection(connection: Option[Connection] = None,
                                    assign_membership_on_login: Option[Boolean] = None,

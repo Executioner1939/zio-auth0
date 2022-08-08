@@ -5,7 +5,7 @@ import com.auth0.client.mgmt.ManagementAPI
 import com.auth0.json.auth.TokenHolder
 import com.auth0.net.Request
 import io.bitlevel.zio.auth0.core.domain.Configuration
-import zio.{Ref, Semaphore, Task, TaskLayer, UIO, ZIO, ZLayer}
+import zio.{Ref, Semaphore, Task, TaskLayer, UIO, URLayer, ZIO, ZLayer}
 
 import java.time.Instant
 
@@ -97,9 +97,10 @@ object Client {
     )
   }
 
-  def create(configuration: Configuration): TaskLayer[Client] = {
+  val layer: ZLayer[Configuration, Throwable, Client] = {
     ZLayer {
       for {
+        configuration  <- ZIO.service[Configuration]
         _              <- ZIO.logDebug("Constructing Auth0 AuthAPI to retrieve Access Tokens")
         authApi         = createAuthApi(configuration)
         _              <- ZIO.logDebug("Attempting to Authenticate to the Auth0 Management API")

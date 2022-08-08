@@ -37,7 +37,7 @@ object User {
                           phone_number: String,
                           phone_verified: Boolean,
                           username: Option[String],
-                          connection: String,
+                          connection: Option[String],
                           blocked: Boolean,
                           app_metadata: Option[Map[String, AnyRef]],
                           user_metadata: Option[Map[String, AnyRef]],
@@ -46,7 +46,7 @@ object User {
                           user_id: Option[String],
                           password: Option[Array[Char]]) {
     def toJava: JUser = {
-      val user = new JUser(connection)
+      val user = new JUser()
       user.setGivenName(given_name)
       user.setFamilyName(family_name)
       user.setName(name.orNull)
@@ -56,7 +56,7 @@ object User {
       user.setVerifyEmail(verify_email)
       user.setPhoneNumber(phone_number)
       user.setPhoneVerified(phone_verified)
-      user.setConnection(connection)
+      user.setConnection(connection.orNull)
       user.setBlocked(blocked)
       user.setAppMetadata(app_metadata.map(_.asJava).orNull)
       user.setUserMetadata(user_metadata.map(_.asJava).orNull)
