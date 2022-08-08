@@ -98,9 +98,11 @@ final case class UsersService(client: Client) {
    * @param filters the filter to use. Can be null.
    * @return a Request to execute.
    */
-  def getById(userId: String, filters: Option[UserFilter]): Task[User] = client
-    .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
-    .map(_.convert)
+  def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
+    client
+      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
+      .map(_.convert)
+  }
 
 
   // ************************************************************************************************************************************ //
@@ -305,8 +307,8 @@ final case class UsersService(client: Client) {
 
   /**
    * Un-links two User's Identities.
-   * A token with scope update:users is needed.
    *
+   * @note the `update:users` is required.
    * @see https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
    * @param primaryUserId   the primary identity's user id
    * @param secondaryUserId the secondary identity's user id
