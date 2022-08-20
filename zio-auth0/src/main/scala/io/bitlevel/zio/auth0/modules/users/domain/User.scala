@@ -103,7 +103,7 @@ object User {
   }
 
   implicit class UserOps(underlying: JUser) {
-    def convert: User = {
+    def toScala: User = {
       User(
         given_name = underlying.getGivenName,
         family_name = underlying.getFamilyName,

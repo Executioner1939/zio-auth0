@@ -4,7 +4,7 @@ import faker.Faker
 import io.bitlevel.zio.auth0.modules.users.domain.User
 
 object UserData {
-  lazy val create: User.Create = User.Create(
+  lazy val create: () => User.Create = () => User.Create(
     given_name     = Faker.default.firstName(),
     family_name    = Faker.default.lastName(),
     name           = Some(Faker.default.fullName()),

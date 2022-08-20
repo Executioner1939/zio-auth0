@@ -2,8 +2,9 @@ package io.bitlevel.zio.auth0.modules.users
 
 import io.bitlevel.zio.auth0.core.Client
 import io.bitlevel.zio.auth0.core.domain.Configuration
-import zio.test.ZIOSpec
-import zio.{Scope, ZLayer}
+import zio.test.{Live, ZIOSpec}
+import zio.{Scope, ZIO, ZLayer}
+import zio.System
 import zio.config.ConfigDescriptor._
 import zio.config._
 
@@ -15,6 +16,8 @@ abstract class SharedClientSpec extends ZIOSpec[Client] {
   ).to[Configuration]
 
   override def bootstrap: ZLayer[Scope, Any, Client] = {
-    ZConfig.fromSystemEnv(CONFIG_AUTH0) >>> Client.layer
+    ZLayer.scoped(ZIO.withSystemScoped(System.SystemLive)) >>>
+    ZConfig.fromSystemEnv(CONFIG_AUTH0) >>>
+    Client.layer
   }
 }

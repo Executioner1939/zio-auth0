@@ -36,8 +36,23 @@ final case class UsersService(client: Client) {
    * @param user the user data to set
    * @return a Request to execute.
    */
-  def create(user: User.Create): Task[JUser] = client
+  def create(user: User.Create): Task[User] = client
     .execute(() => client.management.users().create(user.toJava))
+    .map(_.toScala)
+
+  /**
+   * Update an existing User.
+   * A token with scope update:users is needed.
+   * If you're updating app_metadata you'll also need update:users_app_metadata scope.
+   *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id
+   * @param userId the user id
+   * @param user   the user data to set
+   * @return a Request to execute.
+   */
+  def update(userId: String, user: User.Update): Task[User] = client
+    .execute(() => client.management.users().update(userId, user.toJava))
+    .map(_.toScala)
 
   /**
    * Request all the Users.
@@ -53,7 +68,7 @@ final case class UsersService(client: Client) {
 
     client
       .execute(() => client.management.users().list(params))
-      .map(_.getItems.asScala.map(_.convert).toList)
+      .map(_.getItems.asScala.map(_.toScala).toList)
   }
 
   /**
@@ -86,7 +101,7 @@ final case class UsersService(client: Client) {
 
     client
       .execute(() => client.management.users().listByEmail(emailAddress, params))
-      .map(_.asScala.map(_.convert).toList)
+      .map(_.asScala.map(_.toScala).toList)
   }
 
   /**
@@ -102,7 +117,7 @@ final case class UsersService(client: Client) {
   def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
     client
       .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
-      .map(_.convert)
+      .map(_.toScala)
   }
 
 
