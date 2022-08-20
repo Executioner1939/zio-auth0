@@ -50,9 +50,12 @@ final case class UsersService(client: Client) {
    * @param user   the user data to set
    * @return a Request to execute.
    */
-  def update(userId: String, user: User.Update): Task[User] = client
-    .execute(() => client.management.users().update(userId, user.toJava))
-    .map(_.toScala)
+  def update(userId: String, user: User.Update): Task[User] = {
+    println(user.toJava.getPhoneNumber)
+    client
+      .execute(() => client.management.users().update(userId, user.toJava))
+      .map(_.toScala)
+  }
 
   /**
    * Request all the Users.

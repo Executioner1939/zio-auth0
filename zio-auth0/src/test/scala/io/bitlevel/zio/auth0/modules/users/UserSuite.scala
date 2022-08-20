@@ -19,6 +19,7 @@ object UserSuite extends SharedClientSpec {
         for {
           users <- ZIO.service[UsersService]
           user0 <- users.create(UserData.create())
+          _ = println(user0)
           user1 <- users.update(user0.user_id, User.Update(name = Some("Updated")))
         } yield assertTrue(user1.name.contains("Updated"))
       },

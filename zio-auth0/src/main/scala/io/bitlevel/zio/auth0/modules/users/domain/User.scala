@@ -11,8 +11,8 @@ final case class User(given_name: String,
                       name: Option[String],
                       email: String,
                       email_verified: Boolean,
-                      phone_number: String,
-                      phone_verified: Boolean,
+                      phone_number: Option[String],
+                      phone_verified: Option[Boolean],
                       username: Option[String],
                       blocked: Boolean,
                       app_metadata: Option[Map[String, Any]],
@@ -34,10 +34,10 @@ object User {
                           email: String,
                           verify_email: Boolean,
                           email_verified: Boolean,
-                          phone_number: String,
-                          phone_verified: Boolean,
+                          phone_number: Option[String],
+                          phone_verified: Option[Boolean],
                           username: Option[String],
-                          connection: Option[String],
+                          connection: String,
                           blocked: Boolean,
                           app_metadata: Option[Map[String, AnyRef]],
                           user_metadata: Option[Map[String, AnyRef]],
@@ -46,7 +46,7 @@ object User {
                           user_id: Option[String],
                           password: Option[Array[Char]]) {
     def toJava: JUser = {
-      val user = new JUser()
+      val user = new JUser(connection)
       user.setGivenName(given_name)
       user.setFamilyName(family_name)
       user.setName(name.orNull)
@@ -54,9 +54,8 @@ object User {
       user.setUsername(username.orNull)
       user.setEmail(email)
       user.setVerifyEmail(verify_email)
-      user.setPhoneNumber(phone_number)
-      user.setPhoneVerified(phone_verified)
-      user.setConnection(connection.orNull)
+      user.setPhoneNumber(phone_number.orNull)
+      phone_verified.foreach(b => user.setPhoneVerified(b.booleanValue()))
       user.setBlocked(blocked)
       user.setAppMetadata(app_metadata.map(_.asJava).orNull)
       user.setUserMetadata(user_metadata.map(_.asJava).orNull)
@@ -84,20 +83,20 @@ object User {
                           picture: Option[URI] = None) {
     def toJava: JUser = {
       val user = new JUser()
-      user.setGivenName(given_name.orNull)
-      user.setFamilyName(family_name.orNull)
-      user.setName(name.orNull)
-      user.setNickname(nickname.orNull)
-      user.setUsername(username.orNull)
-      user.setEmail(email.orNull)
-      user.setVerifyEmail(verify_email.exists(_.booleanValue()))
-      user.setPhoneNumber(phone_number.orNull)
-      user.setPhoneVerified(phone_verified.exists(_.booleanValue()))
-      user.setConnection(connection.orNull)
-      user.setBlocked(blocked.exists(_.booleanValue()))
-      user.setAppMetadata(app_metadata.map(_.asJava).orNull)
-      user.setUserMetadata(user_metadata.map(_.asJava).orNull)
-      user.setPicture(picture.map(_.toString).orNull)
+      given_name.foreach(i => user.setGivenName(i))
+      family_name.foreach(i => user.setFamilyName(i))
+      name.foreach(i => user.setName(i))
+      nickname.foreach(i => user.setNickname(i))
+      username.foreach(i => user.setUsername(i))
+      email.foreach(i => user.setEmail(i))
+      verify_email.foreach(i => user.setVerifyEmail(i))
+      phone_number.foreach(i => user.setPhoneNumber(i))
+      phone_verified.foreach(i => user.setPhoneVerified(i))
+      connection.foreach(i => user.setConnection(i))
+      blocked.foreach(i => user.setBlocked(i))
+      app_metadata.foreach(i => user.setAppMetadata(i.asJava))
+      user_metadata.foreach(i => user.setUserMetadata(i.asJava))
+      picture.foreach(i => user.setPicture(i.toString))
       user
     }
   }
@@ -107,24 +106,24 @@ object User {
       User(
         given_name = underlying.getGivenName,
         family_name = underlying.getFamilyName,
-        name = Some(underlying.getName),
+        name = Option(underlying.getName),
         email = underlying.getEmail,
         email_verified = underlying.isEmailVerified,
-        phone_number = underlying.getPhoneNumber,
-        phone_verified = underlying.isPhoneVerified,
-        username = Some(underlying.getUsername),
+        phone_number = Option(underlying.getPhoneNumber),
+        phone_verified = Option(underlying.isPhoneVerified),
+        username = Option(underlying.getUsername),
         blocked = underlying.isBlocked,
-        app_metadata = Some(underlying.getAppMetadata).map(_.asScala.toMap),
-        user_metadata = Some(underlying.getUserMetadata).map(_.asScala.toMap),
-        nickname = Some(underlying.getNickname),
-        picture = Some(underlying.getPicture).map(URI.create),
+        app_metadata = Option(underlying.getAppMetadata).map(_.asScala.toMap),
+        user_metadata = Option(underlying.getUserMetadata).map(_.asScala.toMap),
+        nickname = Option(underlying.getNickname),
+        picture = Option(underlying.getPicture).map(URI.create),
         user_id = underlying.getId,
-        multifactor = Some(underlying.getMultifactor).map(_.asScala.toList),
-        last_ip = Some(underlying.getLastIP),
-        last_login = Some(underlying.getLastLogin).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime),
-        logins_count = Some(underlying.getLoginsCount),
+        multifactor = Option(underlying.getMultifactor).map(_.asScala.toList),
+        last_ip = Option(underlying.getLastIP),
+        last_login = Option(underlying.getLastLogin).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime),
+        logins_count = Option(underlying.getLoginsCount),
         created_at = underlying.getCreatedAt.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime,
-        updated_at = Some(underlying.getUpdatedAt).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime)
+        updated_at = Option(underlying.getUpdatedAt).map(_.toInstant.atZone(ZoneId.systemDefault()).toLocalDateTime)
       )
     }
   }
