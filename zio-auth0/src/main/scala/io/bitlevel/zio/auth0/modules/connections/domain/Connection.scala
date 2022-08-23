@@ -1,6 +1,7 @@
 package io.bitlevel.zio.auth0.modules.connections.domain
 
 import com.auth0.json.mgmt.{Connection => JConnection}
+
 import scala.jdk.CollectionConverters._
 
 final case class Connection(name: String,

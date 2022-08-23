@@ -5,7 +5,7 @@ import com.auth0.client.mgmt.ManagementAPI
 import com.auth0.json.auth.TokenHolder
 import com.auth0.net.Request
 import io.bitlevel.zio.auth0.core.domain.Configuration
-import zio.{Ref, Semaphore, Task, TaskLayer, UIO, URLayer, ZIO, ZLayer}
+import zio.{Ref, Semaphore, Task, UIO, ZIO, ZLayer}
 
 import java.time.Instant
 

@@ -1,6 +1,6 @@
 package io.bitlevel.zio.auth0.modules.implicits
 
-import com.auth0.client.mgmt.filter.{LogEventFilter => JLogEventFilter, PageFilter => JPageFilter, RolesFilter => JRolesFilter, UserFilter => JUserFilter, ConnectionFilter => JConnectionFilter}
+import com.auth0.client.mgmt.filter.{ConnectionFilter => JConnectionFilter, LogEventFilter => JLogEventFilter, PageFilter => JPageFilter, RolesFilter => JRolesFilter, UserFilter => JUserFilter}
 import io.bitlevel.zio.auth0.modules.connections.domain.ConnectionFilter
 import io.bitlevel.zio.auth0.modules.domain.filters.{LogEventFilter, PageFilter}
 import io.bitlevel.zio.auth0.modules.roles.domain.RolesFilter

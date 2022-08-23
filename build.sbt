@@ -70,7 +70,7 @@ lazy val global = Seq(
   addCompilerPlugin ("com.olegpy" %% "better-monadic-for" % "0.3.1"),
 
   // Testing Frameworks
-//  testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
+  testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
 )
 
 
