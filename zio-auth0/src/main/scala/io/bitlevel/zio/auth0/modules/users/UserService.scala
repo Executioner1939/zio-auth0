@@ -26,7 +26,7 @@ import scala.jdk.CollectionConverters._
  * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email
  * @param client the underlying HTTP Client
  */
-final case class UsersService(client: Client) {
+final case class UserService(client: Client) {
 
   /**
    * Create a User.
@@ -91,16 +91,19 @@ final case class UsersService(client: Client) {
    *
    * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email/get_users_by_email
    * @param emailAddress the email of the users to look up.
-   * @param filter       the filter to use. Can be null.
+   * @param filters       the filter to use.
    * @return a Request to execute.
    */
-  def listByEmail(emailAddress: String, filter: FieldsFilter): Task[List[User]] = {
-    val params = filter.fields.fold(new JFieldsFilter()) { fields =>
-      new JFieldsFilter().withFields(fields.fields, fields.includeFields)
+  def listByEmail(emailAddress: String, filters: Option[FieldsFilter]): Task[List[User]] = {
+    val params = {
+      for {
+        filter <- filters
+        fields <- filter.fields
+      } yield new JFieldsFilter().withFields(fields.fields, fields.includeFields)
     }
 
     client
-      .execute(() => client.management.users().listByEmail(emailAddress, params))
+      .execute(() => client.management.users().listByEmail(emailAddress, params.orNull))
       .map(_.asScala.map(_.toScala).toList)
   }
 
@@ -352,8 +355,8 @@ final case class UsersService(client: Client) {
   }
 }
 
-object UsersService {
-  val layer: URLayer[Client, UsersService] = {
-    ZLayer(ZIO.service[Client].map(UsersService(_)))
+object UserService {
+  val layer: URLayer[Client, UserService] = {
+    ZLayer(ZIO.service[Client].map(UserService(_)))
   }
 }

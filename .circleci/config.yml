@@ -1,5 +1,22 @@
 version: 2.1
 jobs:
+  compile_and_test:
+    docker:
+      - image: cimg/openjdk:14.0
+    working_directory: ~/code
+    steps:
+      - checkout
+      - restore_cache:
+          key: sbt-cache-0
+      - run:
+          name: Run Tests
+          command: sbt clean test
+      - save_cache:
+          key: sbt-cache-0
+          paths:
+            - "~/.m2"
+            - "~/.sbt"
+            - "~/.ivy2/cache"
   publish_and_release:
     docker:
       - image: cimg/openjdk:14.0
@@ -32,7 +49,12 @@ jobs:
 workflows:
   deployment:
     jobs:
+      - compile_and_test:
+          context:
+            - Auth0
       - publish_and_release:
+          requires:
+            - compile_and_test
           context:
             - Sonatype
           filters:
