@@ -67,14 +67,29 @@ lazy val global = Seq(
   ),
 
   // Global Compiler Settings
-  addCompilerPlugin ("com.olegpy" %% "better-monadic-for" % "0.3.1")
+  addCompilerPlugin ("com.olegpy" %% "better-monadic-for" % "0.3.1"),
+
+  // Testing Frameworks
+  testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
 )
 
 
-val zio: Seq[ModuleID] = Seq(
-  "dev.zio" %% "zio" % "2.0.0",
-  "dev.zio" %% "zio-test" % "2.0.0" % Test
-)
+val zio: Seq[ModuleID] = {
+  val version = "2.0.0"
+
+  Seq(
+    "dev.zio" %% "zio"          % version,
+    "dev.zio" %% "zio-test"     % version % Test,
+    "dev.zio" %% "zio-test-sbt" % version % Test,
+    "dev.zio" %% "zio-config"   % "3.0.1" % Test
+  )
+}
+
+val `scalacheck-faker`: Seq[ModuleID] = {
+  Seq(
+    "io.github.etspaceman" %% "scalacheck-faker" % "7.0.0" % Test
+  )
+}
 
 val auth0: Seq[ModuleID] = Seq(
   "com.auth0" % "auth0" % "1.42.0"
@@ -82,8 +97,7 @@ val auth0: Seq[ModuleID] = Seq(
 
 lazy val `zio-auth0` = (project in file("./zio-auth0"))
   .settings(global: _*)
-  .settings(libraryDependencies ++= zio ++ auth0)
-  .settings(testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"))
+  .settings(libraryDependencies ++= zio ++ auth0 ++ `scalacheck-faker`)
   .settings(name := "zio-auth0", publishArtifact := true)
 
 // ---------------------------------------------- //

@@ -155,6 +155,10 @@ case class TicketService(client: Client) {
                             markEmailAsVerified: Option[Boolean],
                             includeEmailInRedirect: Option[Boolean]): Task[String] = {
     val params = new PasswordChangeTicket(emailAddress, connectionId)
+    params.setClientId(???)
+    params.setTTLSeconds(???)
+    params.setMarkEmailAsVerified(true)
+
     clientId.foreach(params.setClientId)
     organizationId.foreach(params.setOrganizationId)
     ttlSec.foreach(i => params.setTTLSeconds(i.intValue()))

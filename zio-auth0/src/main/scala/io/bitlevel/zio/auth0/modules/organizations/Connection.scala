@@ -6,6 +6,15 @@ final case class Connection(name: String,
                             strategy: String)
 
 object Connection {
+  implicit class ConnectionOps0(underlying: JConnection) {
+    def toScala: Connection = {
+      Connection(
+        name = underlying.getName,
+        strategy = underlying.getStrategy
+      )
+    }
+  }
+
   implicit class ConnectionOps1(underlying: Connection) {
     def toJava: JConnection = {
       val connection = new JConnection()

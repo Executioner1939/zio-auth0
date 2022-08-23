@@ -2,11 +2,10 @@ package io.bitlevel.zio.auth0.modules.users
 
 import com.auth0.client.mgmt.filter.{FieldsFilter => JFieldsFilter, UserFilter => JUserFilter}
 import com.auth0.json.mgmt.organizations.OrganizationsPage
-import com.auth0.json.mgmt.users.{User => JUser}
 import io.bitlevel.zio.auth0.core.Client
+import io.bitlevel.zio.auth0.modules.domain.LogEvent
 import io.bitlevel.zio.auth0.modules.domain.LogEvent._
 import io.bitlevel.zio.auth0.modules.domain.filters.{FieldsFilter, LogEventFilter, PageFilter}
-import io.bitlevel.zio.auth0.modules.domain.LogEvent
 import io.bitlevel.zio.auth0.modules.implicits.JavaConversions._
 import io.bitlevel.zio.auth0.modules.roles.domain.Role
 import io.bitlevel.zio.auth0.modules.roles.domain.Role._
@@ -14,7 +13,7 @@ import io.bitlevel.zio.auth0.modules.users.domain.Identity._
 import io.bitlevel.zio.auth0.modules.users.domain.Permission._
 import io.bitlevel.zio.auth0.modules.users.domain.User._
 import io.bitlevel.zio.auth0.modules.users.domain._
-import zio.Task
+import zio.{Task, URLayer, ZIO, ZLayer}
 
 import scala.jdk.CollectionConverters._
 
@@ -25,7 +24,7 @@ import scala.jdk.CollectionConverters._
  * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email
  * @param client the underlying HTTP Client
  */
-final case class UsersService(client: Client) {
+final case class UserService(client: Client) {
 
   /**
    * Create a User.
@@ -35,8 +34,23 @@ final case class UsersService(client: Client) {
    * @param user the user data to set
    * @return a Request to execute.
    */
-  def create(user: User.Create): Task[JUser] = client
+  def create(user: User.Create): Task[User] = client
     .execute(() => client.management.users().create(user.toJava))
+    .map(_.toScala)
+
+  /**
+   * Update an existing User.
+   * A token with scope update:users is needed.
+   * If you're updating app_metadata you'll also need update:users_app_metadata scope.
+   *
+   * @see https://auth0.com/docs/api/management/v2#!/Users/patch_users_by_id
+   * @param userId the user id
+   * @param user   the user data to set
+   * @return a Request to execute.
+   */
+  def update(userId: String, user: User.Update): Task[User] = client
+    .execute(() => client.management.users().update(userId, user.toJava))
+    .map(_.toScala)
 
   /**
    * Request all the Users.
@@ -52,7 +66,7 @@ final case class UsersService(client: Client) {
 
     client
       .execute(() => client.management.users().list(params))
-      .map(_.getItems.asScala.map(_.convert).toList)
+      .map(_.getItems.asScala.map(_.toScala).toList)
   }
 
   /**
@@ -75,17 +89,20 @@ final case class UsersService(client: Client) {
    *
    * @see https://auth0.com/docs/api/management/v2#!/Users_By_Email/get_users_by_email
    * @param emailAddress the email of the users to look up.
-   * @param filter       the filter to use. Can be null.
+   * @param filters       the filter to use.
    * @return a Request to execute.
    */
-  def listByEmail(emailAddress: String, filter: FieldsFilter): Task[List[User]] = {
-    val params = filter.fields.fold(new JFieldsFilter()) { fields =>
-      new JFieldsFilter().withFields(fields.fields, fields.includeFields)
+  def listByEmail(emailAddress: String, filters: Option[FieldsFilter]): Task[List[User]] = {
+    val params = {
+      for {
+        filter <- filters
+        fields <- filter.fields
+      } yield new JFieldsFilter().withFields(fields.fields, fields.includeFields)
     }
 
     client
-      .execute(() => client.management.users().listByEmail(emailAddress, params))
-      .map(_.asScala.map(_.convert).toList)
+      .execute(() => client.management.users().listByEmail(emailAddress, params.orNull))
+      .map(_.asScala.map(_.toScala).toList)
   }
 
   /**
@@ -98,9 +115,11 @@ final case class UsersService(client: Client) {
    * @param filters the filter to use. Can be null.
    * @return a Request to execute.
    */
-  def getById(userId: String, filters: Option[UserFilter]): Task[User] = client
-    .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
-    .map(_.convert)
+  def getById(userId: String, filters: Option[UserFilter]): Task[User] = {
+    client
+      .execute(() => client.management.users().get(userId, filters.fold(new JUserFilter())(_.toJava)))
+      .map(_.toScala)
+  }
 
 
   // ************************************************************************************************************************************ //
@@ -305,8 +324,8 @@ final case class UsersService(client: Client) {
 
   /**
    * Un-links two User's Identities.
-   * A token with scope update:users is needed.
    *
+   * @note the `update:users` is required.
    * @see https://auth0.com/docs/api/management/v2#!/Users/delete_provider_by_user_id
    * @param primaryUserId   the primary identity's user id
    * @param secondaryUserId the secondary identity's user id
@@ -331,5 +350,11 @@ final case class UsersService(client: Client) {
     client
       .execute(() => client.management.users().getEnrollments(userId))
       .map(_.asScala.map(Enrollment.fromJava).toList)
+  }
+}
+
+object UserService {
+  val layer: URLayer[Client, UserService] = {
+    ZLayer(ZIO.service[Client].map(UserService(_)))
   }
 }
