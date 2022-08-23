@@ -7,7 +7,7 @@ import io.bitlevel.zio.auth0.modules.roles.domain.Role._
 import io.bitlevel.zio.auth0.modules.roles.domain.{Role, RolesFilter}
 import io.bitlevel.zio.auth0.modules.users.domain.Permission
 import io.bitlevel.zio.auth0.modules.users.domain.Permission._
-import zio.{Task, ZIO}
+import zio.{Task, URLayer, ZIO, ZLayer}
 
 import scala.jdk.CollectionConverters._
 
@@ -27,7 +27,7 @@ case class RoleService(client: Client) {
    * @param role the role data to set
    * @return a Request to execute.
    */
-  def create(role: Role.Update): Task[Role] = client
+  def create(role: Role.Create): Task[Role] = client
     .execute(() => client.management.roles().create(role.toJava))
     .map(_.convert)
 
@@ -140,4 +140,10 @@ case class RoleService(client: Client) {
   def assign(roleId: String, userIds: List[String]): ZIO[Any, Throwable, Unit] = client
     .execute(() => client.management.roles().assignUsers(roleId, userIds.asJava))
     .unit
+}
+
+object RoleService {
+  val layer: URLayer[Client, RoleService] = {
+    ZLayer(ZIO.service[Client].map(RoleService(_)))
+  }
 }

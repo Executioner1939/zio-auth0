@@ -5,7 +5,7 @@ import com.auth0.client.mgmt.ManagementAPI
 import com.auth0.json.auth.TokenHolder
 import com.auth0.net.Request
 import io.bitlevel.zio.auth0.core.domain.Configuration
-import zio.{Ref, Semaphore, Task, UIO, ZIO, ZLayer}
+import zio.{Cause, Ref, Semaphore, Task, UIO, ZIO, ZLayer}
 
 import java.time.Instant
 
@@ -60,8 +60,10 @@ case class Client(configuration: Configuration, semaphore: Semaphore, ref: Ref[T
     semaphore.withPermit {
       for {
         isTokenExpired <- isTokenExpired
-        _ <- renewAccessToken().when(isTokenExpired)
-        result <- ZIO.fromCompletableFuture(request().executeAsync())
+        _              <- renewAccessToken().when(isTokenExpired)
+        result         <- ZIO.fromCompletableFuture(request().executeAsync()).tapError { ex =>
+          ZIO.logErrorCause()
+        }
       } yield result
     }
   }

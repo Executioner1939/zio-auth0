@@ -191,9 +191,9 @@ final case class UserService(client: Client) {
    * @param pageFilter an optional pagination filter
    * @return a Request to execute
    */
-  def listRoles(userId: String, pageFilter: PageFilter): Task[List[Role]] = {
+  def listRoles(userId: String, pageFilter: Option[PageFilter]): Task[List[Role]] = {
     client
-      .execute(() => client.management.users().listRoles(userId, pageFilter.toJava))
+      .execute(() => client.management.users().listRoles(userId, pageFilter.map(_.toJava).orNull))
       .map(_.getItems.asScala.map(_.convert).toList)
   }
 

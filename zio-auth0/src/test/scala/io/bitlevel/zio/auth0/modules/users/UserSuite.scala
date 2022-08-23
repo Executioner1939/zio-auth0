@@ -1,6 +1,7 @@
 package io.bitlevel.zio.auth0.modules.users
 
 import io.bitlevel.zio.auth0.core.Client
+import io.bitlevel.zio.auth0.modules.roles.RoleService
 import io.bitlevel.zio.auth0.modules.users.domain.User
 import zio._
 import zio.test._
@@ -67,8 +68,53 @@ object UserSuite extends SharedClientSpec {
           user0 <- users.create(UserData.create())
           user1 <- users.listByEmail(user0.email, filters = None)
         } yield assertTrue(user1.exists(_.user_id == user0.user_id))
+      },
+
+      test("can add roles to user") {
+        for {
+          users <- ZIO.service[UserService]
+          roles <- ZIO.service[RoleService]
+
+          roles0  <- roles.create(RoleData.create())
+          user0   <- users.create(UserData.create())
+          _       <- users.addRoles(user0.user_id, List(roles0.id))
+          roles1  <- users.listRoles(user0.user_id, pageFilter = None)
+        } yield assertTrue(roles1.exists(_.id == roles0.id))
+      },
+
+      test("can list the roles assigned to a user") {
+        for {
+          users     <- ZIO.service[UserService]
+          roles     <- ZIO.service[RoleService]
+          user0     <- users.create(UserData.create())
+          role0     <- roles.create(RoleData.create())
+          role1     <- roles.create(RoleData.create())
+          role2     <- roles.create(RoleData.create())
+          role3     <- roles.create(RoleData.create())
+          _         <- users.addRoles(user0.user_id, List(role0.id, role1.id, role2.id, role3.id))
+          rolesList <- users.listRoles(user0.user_id, pageFilter = None)
+
+        } yield assertTrue(
+          rolesList.exists(_.id == role0.id) &&
+          rolesList.exists(_.id == role1.id) &&
+          rolesList.exists(_.id == role2.id) &&
+          rolesList.exists(_.id == role3.id)
+        )
+      },
+
+      test("can remove roles from a user") {
+        for {
+          users <- ZIO.service[UserService]
+          roles <- ZIO.service[RoleService]
+
+          roles0 <- roles.create(RoleData.create())
+          user0  <- users.create(UserData.create())
+          _      <- users.addRoles(user0.user_id, List(roles0.id))
+          _      <- users.removeRoles(user0.user_id, List(roles0.id))
+          roles1 <- users.listRoles(user0.user_id, pageFilter = None)
+        } yield assertTrue(!roles1.exists(_.id == roles0.id))
       }
 
     ) @@ TestAspect.aroundAllWith(before())(after(_).ignore)
-  }.provideLayer(UserService.layer)
+  }.provideLayer(UserService.layer ++ RoleService.layer)
 }
